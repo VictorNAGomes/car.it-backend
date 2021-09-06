@@ -1,0 +1,33 @@
+{
+  "name": "car.it-backend",
+  "version": "1.0.0",
+  "description": "Car.it backend api",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joaby-oliveira/car.it-backend.git"
+  },
+  "lint-staged": {
+    "*.js": [
+      "standard --fix",
+      "git add"
+    ]
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/joaby-oliveira/car.it-backend/issues"
+  },
+  "homepage": "https://github.com/joaby-oliveira/car.it-backend#readme",
+  "devDependencies": {
+    "dotenv": "^10.0.0",
+    "husky": "^7.0.1",
+    "lint-staged": "^11.0.1",
+    "nodemon": "^2.0.12",
+    "standard": "^16.0.3"
+  }
+}
