@@ -38,7 +38,7 @@ create table cars(
     steering enum("Hidráulica", "Eletro-hidráulica", "Elétrica", "Mecânica") not null,
     transmission enum("Manual", "Automatizada", "Automática") not null,
     doors int(2) not null,
-    fuel enum("Gasolina", "Etanol", "Flex", "Diesel", "Gás", "Eletricidade"),
+    fuel enum("Gasolina", "Etanol", "Flex", "Diesel", "Gás", "Eletricidade") not null,
     createdAt datetime not null default now(),
     editedAt datetime,
     user_id int not null,
