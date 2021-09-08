@@ -18,6 +18,7 @@ const strings = (string, res, value) => {
       status: false,
       msg: 'O campo ' + value + ' deve ter pelo menos 3 caracteres. '
     })
+    res.utilized = true
     return false
   }
 }
@@ -25,7 +26,6 @@ const strings = (string, res, value) => {
 const userValidation = {
   name: (name, res) => {
     strings(name, res, 'Nome')
-    return false
   },
   email: (email, res) => {
     if (email === undefined || utils.isEmpty(email) || !utils.isValidLength(email, 2)) {
@@ -34,6 +34,7 @@ const userValidation = {
         status: false,
         msg: 'O email deve ter mais de 2 caracteres. '
       })
+      res.utilized = true
       return false
     } else if (utils.isSpaced(email)) {
       res.statusCode = 406
@@ -41,6 +42,7 @@ const userValidation = {
         status: false,
         msg: 'O email não deve ter espaços. '
       })
+      res.utilized = true
       return false
     } else if (!utils.isValidEmail(email)) {
       res.statusCode = 406
@@ -48,6 +50,7 @@ const userValidation = {
         status: false,
         msg: 'O email deve ser válido. '
       })
+      res.utilized = true
       return false
     }
   },
@@ -58,6 +61,7 @@ const userValidation = {
         status: false,
         msg: 'A senha deve ter pelo menos 8 caracteres. '
       })
+      res.utilized = true
       return false
     }
   },
@@ -68,6 +72,7 @@ const userValidation = {
         status: false,
         msg: 'O CPF/CNPJ deve conter ao menos 11 números. '
       })
+      res.utilized = true
       return false
     } else if (!utils.isOnlyNumber(cpfCnpj)) {
       res.statusCode = 406
@@ -75,6 +80,7 @@ const userValidation = {
         status: false,
         msg: 'O CPF/CNPJ deve conter apenas números. '
       })
+      res.utilized = true
       return false
     } else if (utils.isValidMaxLength(cpfCnpj, 14)) {
       res.statusCode = 406
@@ -82,6 +88,7 @@ const userValidation = {
         status: false,
         msg: 'O CPF/CNPJ deve conter no máximo 14 números. '
       })
+      res.utilized = true
       return false
     }
   },
@@ -92,6 +99,7 @@ const userValidation = {
         status: false,
         msg: 'O CEP deve conter 8 números. '
       })
+      res.utilized = true
       return false
     } else if (!utils.isOnlyNumber(cep)) {
       res.statusCode = 406
@@ -99,20 +107,18 @@ const userValidation = {
         status: false,
         msg: 'O CEP deve conter apenas números. '
       })
+      res.utilized = true
       return false
     }
   },
   state: (state, res) => {
     strings(state, res, 'Estado')
-    return false
   },
   city: (city, res) => {
     strings(city, res, 'Cidade')
-    return false
   },
   road: (road, res) => {
     strings(road, res, 'Rua')
-    return false
   }
 }
 
