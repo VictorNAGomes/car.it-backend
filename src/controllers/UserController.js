@@ -1,11 +1,22 @@
 const User = require('../models/User')
 const bcrypt = require('bcrypt')
+const { userValidation } = require('../validations/validation')
 const salt = bcrypt.genSaltSync(10)
 
 class UserController {
   async create (req, res) {
     const { name, phone, password, email, cpfCnpj, cep, state, city, road, complement } = req.body
     let data = {}
+
+    // com certeza tem como melhorar isso
+    userValidation.name(name, res)
+    userValidation.email(email, res)
+    userValidation.password(password, res)
+    userValidation.cpfCnpj(cpfCnpj, res)
+    userValidation.cep(cep, res)
+    userValidation.state(state, res)
+    userValidation.city(city, res)
+    userValidation.road(road, res)
 
     // verificar os campos do address
     const address = { cep, state, city, road, complement }
