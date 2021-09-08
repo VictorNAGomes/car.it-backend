@@ -13,7 +13,7 @@ create table users (
     rating decimal(2, 1) not null,
     createdAt datetime not null default now(),
     editedAt datetime
-);
+) CHARACTER SET utf8 COLLATE utf8_general_ci;
 
 create table adresses (
     id int not null primary key auto_increment,
@@ -27,7 +27,7 @@ create table adresses (
     constraint fk_address_user_id foreign key (user_id) references users(id) 
         on update cascade 
         on delete cascade
-);
+) CHARACTER SET utf8 COLLATE utf8_general_ci;
 
 create table cars(
     id int not null primary key auto_increment,
@@ -45,12 +45,12 @@ create table cars(
     constraint fk_car_user_id foreign key (user_id) references users(id)
         on update cascade 
         on delete cascade
-);
+) CHARACTER SET utf8 COLLATE utf8_general_ci;
 
 create table additionals(
     id int not null primary key auto_increment,
     name varchar(80) not null
-);
+) CHARACTER SET utf8 COLLATE utf8_general_ci;
 
 create table car_additional(
     id int not null primary key auto_increment,
@@ -62,4 +62,4 @@ create table car_additional(
     constraint fk_additional_id foreign key (additional_id) references additionals(id)
         on update cascade 
         on delete cascade
-);
+) CHARACTER SET utf8 COLLATE utf8_general_ci;

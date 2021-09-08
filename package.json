@@ -32,6 +32,7 @@
     "standard": "^16.0.3"
   },
   "dependencies": {
+    "bcrypt": "^5.0.1",
     "express": "^4.17.1",
     "knex": "^0.95.11",
     "mysql2": "^2.3.0"
