@@ -11,6 +11,11 @@ class User {
     await knex.insert(address).table('adresses')
   }
 
+  async findAll () {
+    const result = await knex.select().table('users')
+    return result
+  }
+
   async findByCpf (cpf) {
     const result = await knex.select().table('users').where({ cpf: cpf })
     return result

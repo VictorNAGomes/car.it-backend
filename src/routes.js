@@ -7,5 +7,6 @@ router.get('/', (req, res) => {
   res.send('aaa')
 })
 router.post('/user', UserController.create)
+router.get('/users', UserController.findAll)
 
 module.exports = router
