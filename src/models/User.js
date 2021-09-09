@@ -21,6 +21,11 @@ class User {
     return result
   }
 
+  async delete (id) {
+    const result = await knex.delete().table('users').where({ id: id })
+    return result
+  }
+
   async findAll () {
     const result = await knex.select().table('users')
     return result

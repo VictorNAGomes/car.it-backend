@@ -12,7 +12,6 @@ class UserController {
 
       // validacoes dos campos
       userValidation.name(name, res)
-      userValidation.phone(phone, res)
       userValidation.email(email, res)
       userValidation.password(password, res)
       userValidation.cpfCnpj(cpfCnpj, res)
@@ -242,6 +241,36 @@ class UserController {
       // se algo deu errado nos updates
       res.statusCode = 500
       res.json({ msg: 'Ocorreu um erro ao atualizar o usuário: ' + error })
+    }
+  }
+
+  async delete (req, res) {
+    const { id } = req.params
+
+    // se o parâmetro não for um numero
+    if (!Number(id)) {
+      res.statusCode = 406
+      res.json({ msg: 'O parâmetro passado precisa ser um número. ' })
+      return
+    }
+
+    // se o id não existir
+    const result = await User.findById(id)
+    if (result.length === 0) {
+      res.statusCode = 406
+      res.json({ msg: 'O ID de usuário indicado não existe no banco de dados. ' })
+      return
+    }
+
+    try {
+      // deleção do usuário
+      await User.delete(id)
+      res.statusCode = 200
+      res.json({ msg: 'Usuário deletado. ID: ' + id })
+    } catch (error) {
+      // deleção com erro
+      res.statusCode = 500
+      res.json({ msg: 'Ocorreu um erro ao deletar o usuário: ' + error })
     }
   }
 }
