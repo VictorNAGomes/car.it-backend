@@ -13,6 +13,12 @@ class Vehicle {
     return vehicles
   }
 
+  async findById (id) {
+    const vehicle = await knex.select().table('vehicles').where({ id: id })
+
+    return vehicle
+  }
+
   async findAdditionalByName (name) {
     const additional = await knex.select().table('additionals').where({ name: name })
 

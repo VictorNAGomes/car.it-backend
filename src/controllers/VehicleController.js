@@ -82,7 +82,37 @@ class VehicleController {
       res.json({ vehicleAdd })
     } catch (err) {
       res.statusCode = 500
-      res.json({ msg: 'Ocorreu um erro ao procurar os anúncios do Veículos: ' + err })
+      res.json({ msg: 'Ocorreu um erro ao procurar os anúncios dos Veículos: ' + err })
+    }
+  }
+
+  async findById (req, res) {
+    try {
+      const { id } = req.params
+      const vehicle = await Vehicle.findById(id)
+
+      if (vehicle.length > 0) {
+        const additional = await Vehicle.findVehicleAdd(id)
+        const additionals = []
+
+        for (const add of additional) {
+          additionals.push(add.name)
+        }
+
+        const vehicleAdd = {
+          ...vehicle,
+          additionals: additionals
+        }
+
+        res.statusCode = 200
+        res.json({ vehicleAdd })
+      } else {
+        res.statusCode = 406
+        res.json({ msg: 'Não há veículos cadastrados com esse id' })
+      }
+    } catch (err) {
+      res.statusCode = 500
+      res.json({ msg: 'Ocorreu um erro ao procurar o anúncio do Veículo: ' + err })
     }
   }
 }
