@@ -1,6 +1,6 @@
 const express = require('express')
 const UserController = require('./controllers/UserController')
-const CarController = require('./controllers/VehicleController')
+const VehicleController = require('./controllers/VehicleController')
 
 const router = express.Router()
 
@@ -13,6 +13,7 @@ router.get('/user/:id', UserController.findById)
 router.put('/user/:id', UserController.update)
 router.delete('/user/:id', UserController.delete)
 
-router.post('/car', CarController.create)
+router.post('/vehicle', VehicleController.create)
+router.get('/vehicles', VehicleController.findAll)
 
 module.exports = router

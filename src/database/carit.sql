@@ -37,6 +37,7 @@ create table vehicles(
     model varchar(30) not null,
     brand varchar(30) not null,
     year char(4) not null,
+    vehicleType enum("Carro", "Moto") not null,
     conservationState enum("Novo", "Seminovo", "Usado"),
     price int(9) not null,
     steering enum("Hidráulica", "Eletro-hidráulica", "Elétrica", "Mecânica"),

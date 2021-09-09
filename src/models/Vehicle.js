@@ -6,6 +6,12 @@ class Vehicle {
 
     return vehicle
   }
+
+  async findAll () {
+    const vehicles = await knex.select().table('vehicles')
+
+    return vehicles
+  }
 }
 
 module.exports = new Vehicle()

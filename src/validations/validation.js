@@ -122,7 +122,7 @@ const userValidation = {
   }
 }
 
-const carValidation = {
+const vehicleValidation = {
   string: (string, res, value) => {
     strings(string, res, value, 2)
     if (utils.isDoubleSpaced(string) && res.utilized === false) {
@@ -156,4 +156,4 @@ const carValidation = {
   }
 }
 
-module.exports = { userValidation, carValidation }
+module.exports = { userValidation, vehicleValidation }
