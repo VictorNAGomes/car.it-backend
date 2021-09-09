@@ -69,3 +69,13 @@ create table vehicle_additional(
         on update cascade 
         on delete cascade
 ) CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+insert into additionals (name) values
+("Ar condicionado"),
+("Câmbio Borboleta"),
+("Vidro Elétrico"),
+("Controle de Estabilidade"),
+("Airbag"),
+("Alarme"),
+("Trava Elétrica"),
+("Teto Solar");
