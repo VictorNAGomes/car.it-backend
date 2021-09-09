@@ -12,6 +12,27 @@ class Vehicle {
 
     return vehicles
   }
+
+  async findAdditionalByName (name) {
+    const additional = await knex.select().table('additionals').where({ name: name })
+
+    return additional
+  }
+
+  async addAdditional (data) {
+    const additional = await knex.insert(data).table('vehicle_additional')
+
+    return additional
+  }
+
+  async findVehicleAdd (vehicleId) {
+    const addAdditionals = await knex.select()
+      .innerJoin('Additionals', 'additionals.id', 'vehicle_additional.additional_id')
+      .table('vehicle_additional')
+      .where('vehicle_id', vehicleId)
+
+    return addAdditionals
+  }
 }
 
 module.exports = new Vehicle()
