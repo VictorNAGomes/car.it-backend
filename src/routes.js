@@ -1,6 +1,6 @@
 const express = require('express')
 const UserController = require('./controllers/UserController')
-const CarController = require('./controllers/CarController')
+const CarController = require('./controllers/VehicleController')
 
 const router = express.Router()
 

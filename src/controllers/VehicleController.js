@@ -1,7 +1,7 @@
-const Car = require('../models/Car')
+const Car = require('../models/Vehicle')
 const { carValidation } = require('../validations/validation')
 
-class CarController {
+class VehicleController {
   async create (req, res) {
     try {
       const { model, brand, year, conservationState, price, steering, transmission, doors, fuel, userId } = req.body
@@ -34,13 +34,13 @@ class CarController {
 
         await Car.create(data)
         res.statusCode = 201
-        res.json({ msg: 'Anúncio do carro cadastrado.' })
+        res.json({ msg: 'Anúncio do Veículo cadastrado.' })
       }
     } catch (err) {
       res.statusCode = 500
-      res.json({ msg: 'Ocorreu um erro ao criar o anúncio do carro: ' + err })
+      res.json({ msg: 'Ocorreu um erro ao criar o anúncio do Veículo: ' + err })
     }
   }
 }
 
-module.exports = new CarController()
+module.exports = new VehicleController()

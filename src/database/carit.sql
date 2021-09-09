@@ -32,16 +32,16 @@ create table adresses (
         on delete cascade
 ) CHARACTER SET utf8 COLLATE utf8_general_ci;
 
-create table cars(
+create table vehicles(
     id int not null primary key auto_increment,
     model varchar(30) not null,
     brand varchar(30) not null,
     year char(4) not null,
     conservationState enum("Novo", "Seminovo", "Usado"),
     price int(9) not null,
-    steering enum("Hidráulica", "Eletro-hidráulica", "Elétrica", "Mecânica") not null,
-    transmission enum("Manual", "Automatizada", "Automática") not null,
-    doors int(1) not null,
+    steering enum("Hidráulica", "Eletro-hidráulica", "Elétrica", "Mecânica"),
+    transmission enum("Manual", "Automatizada", "Automática") not  null,
+    doors int(1),
     fuel enum("Gasolina", "Etanol", "Flex", "Diesel", "Gás", "Eletricidade") not null,
     description text,
     createdAt datetime not null default now(),
@@ -57,11 +57,11 @@ create table additionals(
     name varchar(80) not null
 ) CHARACTER SET utf8 COLLATE utf8_general_ci;
 
-create table car_additional(
+create table vehicle_additional(
     id int not null primary key auto_increment,
-    car_id int not null,
+    vehicle_id int not null,
     additional_id int not null,
-    constraint fk_car_id foreign key (car_id) references cars(id)
+    constraint fk_vehicle_id foreign key (vehicle_id) references vehicles(id)
         on update cascade 
         on delete cascade,
     constraint fk_additional_id foreign key (additional_id) references additionals(id)
