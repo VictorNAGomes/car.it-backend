@@ -11,12 +11,12 @@ const utils = {
   isValidGender: (str) => !str.match(/[^mfo ]/igm)
 }
 
-const strings = (string, res, value) => {
-  if (string === undefined || utils.isEmpty(string) || !utils.isValidLength(string, 3)) {
+const strings = (string, res, value, length) => {
+  if (string === undefined || utils.isEmpty(string) || !utils.isValidLength(string, length)) {
     res.statusCode = 406
     res.json({
       status: false,
-      msg: 'O campo ' + value + ' deve ter pelo menos 3 caracteres. '
+      msg: 'O campo ' + value + ' deve ter pelo menos ' + length + ' caracteres. '
     })
     res.utilized = true
     return false
@@ -25,7 +25,7 @@ const strings = (string, res, value) => {
 
 const userValidation = {
   name: (name, res) => {
-    strings(name, res, 'Nome')
+    strings(name, res, 'Nome', 3)
   },
   email: (email, res) => {
     if (email === undefined || utils.isEmpty(email) || !utils.isValidLength(email, 2)) {
@@ -112,16 +112,48 @@ const userValidation = {
     }
   },
   state: (state, res) => {
-    strings(state, res, 'Estado')
+    strings(state, res, 'Estado', 3)
   },
   city: (city, res) => {
-    strings(city, res, 'Cidade')
+    strings(city, res, 'Cidade', 3)
   },
   road: (road, res) => {
-    strings(road, res, 'Rua')
+    strings(road, res, 'Rua', 3)
   }
 }
 
-const carValidation = {}
+const carValidation = {
+  string: (string, res, value) => {
+    strings(string, res, value, 2)
+    if (utils.isDoubleSpaced(string) && res.utilized === false) {
+      res.statusCode = 406
+      res.json({
+        status: false,
+        msg: 'O campo ' + value + ' não deve ter mais de um espaço entre as palavras'
+      })
+      res.utilized = true
+    }
+  },
+  year: (year, res) => {
+    if (!utils.isValidLength(year, 4) || utils.isValidMaxLength(year, 4)) {
+      res.statusCode = 406
+      res.json({
+        status: false,
+        msg: 'O campo Ano deve ter 4 caracteres'
+      })
+      res.utilized = true
+    }
+  },
+  number: (price, res, length, value) => {
+    if (utils.isValidMaxLength(price, length)) {
+      res.statusCode = 406
+      res.json({
+        status: false,
+        msg: 'O ' + value + ' deve ter no máximo ' + length + ' caracteres'
+      })
+      res.utilized = true
+    }
+  }
+}
 
 module.exports = { userValidation, carValidation }
