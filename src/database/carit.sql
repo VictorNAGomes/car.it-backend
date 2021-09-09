@@ -1,3 +1,5 @@
+drop database if exists carit;
+
 create database if not exists carit;
 
 use carit;
@@ -20,6 +22,7 @@ create table adresses (
     cep varchar(10) not null,
     state varchar(20) not null,
     city varchar(30) not null,
+    district varchar(100) not null,
     road varchar(100) not null,
     complement varchar(10) not null,
     editedAt datetime,
@@ -31,14 +34,16 @@ create table adresses (
 
 create table cars(
     id int not null primary key auto_increment,
-    model varchar(80) not null,
-    year int(4) not null,
-    conservationState varchar(20),
-    price decimal(11,2) not null,
+    model varchar(30) not null,
+    brand varchar(30) not null,
+    year char(4) not null,
+    conservationState enum("Novo", "Seminovo", "Usado"),
+    price int(9) not null,
     steering enum("Hidráulica", "Eletro-hidráulica", "Elétrica", "Mecânica") not null,
     transmission enum("Manual", "Automatizada", "Automática") not null,
-    doors int(2) not null,
+    doors int(1) not null,
     fuel enum("Gasolina", "Etanol", "Flex", "Diesel", "Gás", "Eletricidade") not null,
+    description text,
     createdAt datetime not null default now(),
     editedAt datetime,
     user_id int not null,
