@@ -8,5 +8,7 @@ router.get('/', (req, res) => {
 })
 router.post('/user', UserController.create)
 router.get('/users', UserController.findAll)
+router.get('/user/:id', UserController.findById)
+router.put('/user/:id', UserController.update)
 
 module.exports = router

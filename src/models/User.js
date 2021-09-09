@@ -11,6 +11,16 @@ class User {
     await knex.insert(address).table('adresses')
   }
 
+  async update (id, newUser) {
+    const result = await knex.where({ id: id }).update(newUser).table('users')
+    return result
+  }
+
+  async updateAddress (id, newAddress) {
+    const result = await knex.where({ id: id }).update(newAddress).table('adresses')
+    return result
+  }
+
   async findAll () {
     const result = await knex.select().table('users')
     return result
@@ -33,6 +43,16 @@ class User {
 
   async findByEmail (email) {
     const result = await knex.select().table('users').where({ email: email })
+    return result
+  }
+
+  async findUserWithAddress (id) {
+    const result = await knex.select().table('users').innerJoin('adresses', 'adresses.user_id', 'users.id').whereRaw('users.id = ' + id)
+    return result
+  }
+
+  async findUsersWithAddress () {
+    const result = await knex.select().table('users').innerJoin('adresses', 'adresses.user_id', 'users.id')
     return result
   }
 }
