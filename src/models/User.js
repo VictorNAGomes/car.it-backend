@@ -16,6 +16,11 @@ class User {
     return result
   }
 
+  async findById (id) {
+    const result = await knex.select().table('users').where({ id: id })
+    return result
+  }
+
   async findByCpf (cpf) {
     const result = await knex.select().table('users').where({ cpf: cpf })
     return result
