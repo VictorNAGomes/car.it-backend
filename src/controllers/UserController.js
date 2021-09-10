@@ -239,6 +239,7 @@ class UserController {
       res.json({ msg: 'Usuário atualizado. ', user: user })
     } catch (error) {
       // se algo deu errado nos updates
+      // teste
       res.statusCode = 500
       res.json({ msg: 'Ocorreu um erro ao atualizar o usuário: ' + error })
     }
