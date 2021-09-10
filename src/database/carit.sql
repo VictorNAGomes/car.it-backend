@@ -25,7 +25,6 @@ create table adresses (
     district varchar(100) not null,
     road varchar(100) not null,
     complement varchar(10) not null,
-    editedAt datetime,
     user_id int not null,
     constraint fk_address_user_id foreign key (user_id) references users(id) 
         on update cascade 
