@@ -6,7 +6,7 @@ const salt = bcrypt.genSaltSync(10)
 class UserController {
   async create (req, res) {
     try {
-      const { name, phone, password, email, cpfCnpj, cep, state, city, road, complement } = req.body
+      const { name, phone, password, email, cpfCnpj, cep, state, city, district, road, complement } = req.body
       let data = {}
       res.utilized = false
 
@@ -22,7 +22,7 @@ class UserController {
 
       // se nenhuma validacao deu erro
       if (res.utilized === false) {
-        const address = { cep, state, city, road, complement }
+        const address = { cep, state, city, district, road, complement }
         const emailExists = await User.findByEmail(email)
 
         // se a consulta de email retornar algo
@@ -86,7 +86,22 @@ class UserController {
     // traz um usuário com seu endereco
     try {
       const { id } = req.params
+
+      // se o usuário passar algo que não é um numero
+      if (!Number(id)) {
+        res.statusCode = 406
+        res.json({ msg: 'O parâmetro passado precisa ser um número. ' })
+        return
+      }
+
+      // se o ID do usuário não existir no banco de dados
       const user = await User.findUserWithAddress(id)
+      if (user.length === 0) {
+        res.statusCode = 406
+        res.json({ msg: 'O ID de usuário indicado não existe no banco de dados. ' })
+        return
+      }
+
       res.statusCode = 200
       res.json(user)
     } catch (error) {
@@ -116,7 +131,7 @@ class UserController {
     user = user[0]
     const newUser = {}
     const newAddress = {}
-    const { name, phone, email, cpf, cnpj, cep, state, city, road, complement } = req.body
+    const { name, phone, email, cpf, cnpj, cep, state, city, district, road, complement } = req.body
 
     // VALIDACOES
     res.utilized = false
@@ -131,18 +146,16 @@ class UserController {
       newUser.name = user.name
     }
 
-    res.utilized = false
     if (phone !== undefined) {
       newUser.phone = phone
     } else {
       newUser.phone = user.phone
     }
 
-    res.utilized = false
     if (email !== undefined) {
       userValidation.email(email, res)
       if (res.utilized === false) {
-        newUser.email = name
+        newUser.email = email
       } else {
         return
       }
@@ -150,8 +163,7 @@ class UserController {
       newUser.email = user.email
     }
 
-    res.utilized = false
-    if (cpf !== undefined) {
+    if (cpf !== undefined && cpf !== null) {
       userValidation.cpfCnpj(cpf, res)
       if (res.utilized === false) {
         newUser.cpf = cpf
@@ -162,8 +174,7 @@ class UserController {
       newUser.cpf = user.cpf
     }
 
-    res.utilized = false
-    if (cnpj !== undefined) {
+    if (cnpj !== undefined && cnpj !== null) {
       userValidation.cpfCnpj(cnpj, res)
       if (res.utilized === false) {
         newUser.cnpj = cnpj
@@ -174,7 +185,6 @@ class UserController {
       newUser.cnpj = user.cnpj
     }
 
-    res.utilized = false
     if (cep !== undefined) {
       userValidation.cep(cep, res)
       if (res.utilized === false) {
@@ -186,7 +196,6 @@ class UserController {
       newAddress.cep = user.cep
     }
 
-    res.utilized = false
     if (state !== undefined) {
       userValidation.state(state, res)
       if (res.utilized === false) {
@@ -198,7 +207,6 @@ class UserController {
       newAddress.state = user.state
     }
 
-    res.utilized = false
     if (city !== undefined) {
       userValidation.city(city, res)
       if (res.utilized === false) {
@@ -210,7 +218,12 @@ class UserController {
       newAddress.city = user.city
     }
 
-    res.utilized = false
+    if (district !== undefined) {
+      newAddress.district = district
+    } else {
+      newAddress.district = user.district
+    }
+
     if (road !== undefined) {
       userValidation.road(road, res)
       if (res.utilized === false) {
@@ -230,6 +243,9 @@ class UserController {
 
     try {
       // updates de fato
+      //    const editedAt = new Date().toISOString().slice(0, 19).replace('T', ' ')
+      //    newUser.editedAt = editedAt
+      //    console.log(newUser.editedAt)
       await User.update(id, newUser)
       await User.updateAddress(id, newAddress)
 
