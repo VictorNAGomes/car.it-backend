@@ -39,6 +39,18 @@ class Vehicle {
 
     return addAdditionals
   }
+
+  async deleteAdd (vehicleId) {
+    const additional = await knex.delete().table('vehicle_additional').where({ vehicle_id: vehicleId })
+
+    return additional
+  }
+
+  async update (data, id) {
+    const vehicle = await knex.update(data).table('vehicles').where({ id: id })
+
+    return vehicle
+  }
 }
 
 module.exports = new Vehicle()

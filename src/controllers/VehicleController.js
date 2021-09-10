@@ -4,7 +4,7 @@ const { vehicleValidation } = require('../validations/validation')
 class VehicleController {
   async create (req, res) {
     try {
-      const { model, brand, year, vehicleType, conservationState, price, steering, transmission, doors, fuel, userId, additionals = [] } = req.body
+      const { model, brand, year, vehicleType, conservationState, price, steering, transmission, doors, fuel, description, userId, additionals = [] } = req.body
       res.utilized = false
       const priceString = price.toString()
       const doorString = doors.toString()
@@ -19,6 +19,7 @@ class VehicleController {
       vehicleValidation.string(transmission, res, 'Transmissão')
       vehicleValidation.number(doorString, res, 1, 'Porta')
       vehicleValidation.string(fuel, res, 'Combústivel')
+      vehicleValidation.string(description, res, 'Descrição')
 
       if (res.utilized === false) {
         const data = {
@@ -32,6 +33,7 @@ class VehicleController {
           transmission,
           doors,
           fuel,
+          description,
           user_id: userId
         }
 
@@ -100,12 +102,12 @@ class VehicleController {
         }
 
         const vehicleAdd = {
-          ...vehicle,
+          ...vehicle[0],
           additionals: additionals
         }
 
         res.statusCode = 200
-        res.json({ vehicleAdd })
+        res.json({ vehicle: vehicleAdd })
       } else {
         res.statusCode = 406
         res.json({ msg: 'Não há veículos cadastrados com esse id' })
@@ -113,6 +115,111 @@ class VehicleController {
     } catch (err) {
       res.statusCode = 500
       res.json({ msg: 'Ocorreu um erro ao procurar o anúncio do Veículo: ' + err })
+    }
+  }
+
+  async update (req, res) {
+    try {
+      const { id } = req.params
+      const { model, brand, year, vehicleType, conservationState, price, steering, transmission, doors, fuel, description, additionals = [] } = req.body
+      res.utilized = false
+
+      const vehicle = await Vehicle.findById(id)
+
+      const editedAt = new Date().toISOString().slice(0, 19).replace('T', ' ')
+
+      if (vehicle.length > 0) {
+        const data = {
+          id: vehicle[0].id,
+          model: vehicle[0].model,
+          brand: vehicle[0].brand,
+          year: vehicle[0].year,
+          vehicleType: vehicle[0].vehicleType,
+          conservationState: vehicle[0].conservationState,
+          price: vehicle[0].price,
+          steering: vehicle[0].steering,
+          transmission: vehicle[0].transmission,
+          doors: vehicle[0].doors,
+          fuel: vehicle[0].fuel,
+          description: vehicle[0].description,
+          editedAt: editedAt,
+          user_id: vehicle[0].user_id
+        }
+
+        if (model !== undefined) {
+          vehicleValidation.string(model, res, 'Modelo')
+          data.model = model
+        }
+        if (brand !== undefined) {
+          vehicleValidation.string(brand, res, 'Marca')
+          data.brand = brand
+        }
+        if (year !== undefined) {
+          vehicleValidation.year(year, res)
+          data.year = year
+        }
+        if (vehicleType !== undefined) {
+          vehicleValidation.string(vehicleType, res, 'Tipo de veículo')
+          data.vehicleType = vehicleType
+        }
+        if (conservationState !== undefined) {
+          vehicleValidation.string(conservationState, res, 'Estado de conservação')
+          data.conservationState = conservationState
+        }
+        if (price !== undefined) {
+          const priceString = price.toString()
+          vehicleValidation.number(priceString, res, 11, 'Preço')
+          data.price = price
+        }
+        if (steering !== undefined) {
+          vehicleValidation.string(steering, res, 'Direção')
+          data.steering = steering
+        }
+        if (transmission !== undefined) {
+          vehicleValidation.string(transmission, res, 'Transmissão')
+          data.transmission = transmission
+        }
+        if (doors !== undefined) {
+          const doorString = doors.toString()
+          vehicleValidation.number(doorString, res, 1, 'Porta')
+          data.doors = doors
+        }
+        if (fuel !== undefined) {
+          vehicleValidation.string(fuel, res, 'Combústivel')
+          data.fuel = fuel
+        }
+        if (description !== undefined) {
+          vehicleValidation.string(description, res, 'Combústivel')
+          data.description = description
+        }
+
+        if (res.utilized === false) {
+          await Vehicle.update(data, id)
+
+          if (additionals.length > 0) {
+            await Vehicle.deleteAdd(id)
+
+            for (const add of additionals) {
+              const additional = await Vehicle.findAdditionalByName(add)
+
+              const addData = {
+                vehicle_id: id,
+                additional_id: additional[0].id
+              }
+
+              await Vehicle.addAdditional(addData)
+            }
+          }
+          res.statusCode = 200
+          res.json({ msg: 'Anúncio do Veículo editado com sucesso.' })
+        }
+      } else {
+        res.statusCode = 406
+        res.json({ msg: 'Não há veículos cadastrados com esse id' })
+      }
+    } catch (err) {
+      res.statusCode = 500
+      res.json({ msg: 'Ocorreu um erro ao editar o anúncio do Veículo: ' + err })
     }
   }
 }

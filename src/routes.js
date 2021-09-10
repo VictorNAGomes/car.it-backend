@@ -16,5 +16,6 @@ router.delete('/user/:id', UserController.delete)
 router.post('/vehicle', VehicleController.create)
 router.get('/vehicles', VehicleController.findAll)
 router.get('/vehicle/:id', VehicleController.findById)
+router.put('/vehicle/:id', VehicleController.update)
 
 module.exports = router
