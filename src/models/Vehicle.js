@@ -51,6 +51,12 @@ class Vehicle {
 
     return vehicle
   }
+
+  async delete (id) {
+    const vehicle = await knex.delete().table('vehicles').where({ id: id })
+
+    return vehicle
+  }
 }
 
 module.exports = new Vehicle()

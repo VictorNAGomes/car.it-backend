@@ -222,6 +222,27 @@ class VehicleController {
       res.json({ msg: 'Ocorreu um erro ao editar o anúncio do Veículo: ' + err })
     }
   }
+
+  async delete (req, res) {
+    try {
+      const { id } = req.params
+      const vehicle = await Vehicle.findById(id)
+
+      if (vehicle.length > 0) {
+        await Vehicle.delete(id)
+        await Vehicle.deleteAdd(id)
+
+        res.statusCode = 200
+        res.json({ msg: 'Anúncio do Veículo deletado com sucesso.' })
+      } else {
+        res.statusCode = 406
+        res.json({ msg: 'Não há veículos cadastrados com esse id' })
+      }
+    } catch (err) {
+      res.statusCode = 500
+      res.json({ msg: 'Ocorreu um erro ao deletar o anúncio do Veículo: ' + err })
+    }
+  }
 }
 
 module.exports = new VehicleController()
