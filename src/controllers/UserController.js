@@ -243,19 +243,19 @@ class UserController {
 
     try {
       // updates de fato
-      //    const editedAt = new Date().toISOString().slice(0, 19).replace('T', ' ')
-      //    newUser.editedAt = editedAt
-      //    console.log(newUser.editedAt)
+      const editedAt = new Date().toISOString().slice(0, 19).replace('T', ' ')
+      newUser.editedAt = editedAt
+      console.log(newUser)
+
       await User.update(id, newUser)
       await User.updateAddress(id, newAddress)
 
       // printar o usuario com o respectivo endereco
-      const user = await User.findUserWithAddress(id)
+      const userResult = await User.findById(id)
       res.statusCode = 200
-      res.json({ msg: 'Usuário atualizado. ', user: user })
+      res.json({ msg: 'Usuário atualizado. ', user: userResult })
     } catch (error) {
       // se algo deu errado nos updates
-      // teste
       res.statusCode = 500
       res.json({ msg: 'Ocorreu um erro ao atualizar o usuário: ' + error })
     }
