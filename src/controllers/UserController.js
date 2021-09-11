@@ -1,7 +1,10 @@
 const User = require('../models/User')
 const bcrypt = require('bcrypt')
+// const JWT = require('jsonwebtoken')
 const { userValidation } = require('../validations/validation')
 const salt = bcrypt.genSaltSync(10)
+
+// const secretJwt = process.env.JWT_SECRET
 
 class UserController {
   async create (req, res) {
@@ -288,6 +291,33 @@ class UserController {
       // deleção com erro
       res.statusCode = 500
       res.json({ msg: 'Ocorreu um erro ao deletar o usuário: ' + error })
+    }
+  }
+
+  async login (req, res) {
+    const { email, password } = req.body
+
+    userValidation.email(email, res)
+    if (res.utilized) {
+      return
+    }
+
+    let user = await User.findByEmail(email)
+    user = user[0]
+    if (user !== undefined) {
+      const result = await bcrypt.compare(password, user.password)
+      if (result) {
+        // const token = JWT.sign({ email: email }, secretJwt)
+        const token = 'aaaaaa'
+        res.statusCode = 200
+        res.json({ token: token })
+      } else {
+        res.statusCode = 406
+        res.json({ msg: 'Credenciais inválidas. ' })
+      }
+    } else {
+      res.statusCode = 406
+      res.json({ msg: 'Credenciais inválidas. ' })
     }
   }
 }
