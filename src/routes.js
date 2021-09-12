@@ -1,6 +1,7 @@
 const express = require('express')
 const UserController = require('./controllers/UserController')
 const VehicleController = require('./controllers/VehicleController')
+// const LoginAuth = require('./middlewares/LoginAuth')
 
 const router = express.Router()
 

@@ -1,10 +1,10 @@
 const User = require('../models/User')
 const bcrypt = require('bcrypt')
-// const JWT = require('jsonwebtoken')
+const JWT = require('jsonwebtoken')
 const { userValidation } = require('../validations/validation')
 const salt = bcrypt.genSaltSync(10)
 
-// const secretJwt = process.env.JWT_SECRET
+const secretJwt = process.env.JWT_SECRET
 
 class UserController {
   async create (req, res) {
@@ -248,7 +248,6 @@ class UserController {
       // updates de fato
       const editedAt = new Date().toISOString().slice(0, 19).replace('T', ' ')
       newUser.editedAt = editedAt
-      console.log(newUser)
 
       await User.update(id, newUser)
       await User.updateAddress(id, newAddress)
@@ -307,8 +306,7 @@ class UserController {
     if (user !== undefined) {
       const result = await bcrypt.compare(password, user.password)
       if (result) {
-        // const token = JWT.sign({ email: email }, secretJwt)
-        const token = 'aaaaaa'
+        const token = JWT.sign({ email: email }, secretJwt)
         res.statusCode = 200
         res.json({ token: token })
       } else {
