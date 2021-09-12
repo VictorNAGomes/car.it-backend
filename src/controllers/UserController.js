@@ -3,6 +3,8 @@ const bcrypt = require('bcrypt')
 const JWT = require('jsonwebtoken')
 const { userValidation } = require('../validations/validation')
 const PasswordToken = require('../models/PasswordToken')
+const transporter = require('../transporter')
+
 const salt = bcrypt.genSaltSync(10)
 
 const secretJwt = process.env.JWT_SECRET
@@ -300,6 +302,13 @@ class UserController {
       const user = await User.findByEmail(email)
       if (user.length > 0) {
         const token = await PasswordToken.create(user[0])
+        const message = await transporter.sendMail({
+          from: 'Marcos Almeida <markosalmeidaa@gmail.com>',
+          to: email,
+          subject: 'Token para recuperação de senha. ',
+          text: 'Aqui está o seu token para recuperação de senha: ' + token + '; Utilize-o apenas uma vez. '
+        })
+        console.log(message)
         res.statusCode = 200
         res.json({ msg: 'Confira em seu email o token para recuperação de senha. Token: ' + token })
       } else {
