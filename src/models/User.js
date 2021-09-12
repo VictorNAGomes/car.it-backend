@@ -26,6 +26,11 @@ class User {
     return result
   }
 
+  async changePassword (password, id) {
+    const result = await knex.where({ id: id }).update({ password: password }).table('users')
+    return result
+  }
+
   async findAll () {
     const result = await knex.select().table('users')
     return result

@@ -31,6 +31,16 @@ create table adresses (
         on delete cascade
 ) CHARACTER SET utf8 COLLATE utf8_general_ci;
 
+create table passwordTokens (
+    id int not null primary key auto_increment,
+    token varchar(200),
+    used tinyint default 0,
+    user_id int not null,
+    constraint fk_passwordTokens_user_id foreign key (user_id) references users(id)
+        on update cascade
+        on delete cascade
+) CHARACTER SET utf8 COLLATE utf8_general_ci;
+
 create table vehicles(
     id int not null primary key auto_increment,
     model varchar(30) not null,

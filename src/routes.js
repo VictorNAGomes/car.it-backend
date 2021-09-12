@@ -15,6 +15,8 @@ router.get('/user/:id', UserController.findById)
 router.put('/user/:id', UserController.update)
 router.delete('/user/:id', UserController.delete)
 router.post('/login', UserController.login)
+router.post('/recoverPassword', UserController.recoverPassword)
+router.post('/changePassword', UserController.changePassword)
 
 router.post('/vehicle', VehicleController.create)
 router.get('/vehicles', VehicleController.findAll)

@@ -2,6 +2,7 @@ const User = require('../models/User')
 const bcrypt = require('bcrypt')
 const JWT = require('jsonwebtoken')
 const { userValidation } = require('../validations/validation')
+const PasswordToken = require('../models/PasswordToken')
 const salt = bcrypt.genSaltSync(10)
 
 const secretJwt = process.env.JWT_SECRET
@@ -290,6 +291,55 @@ class UserController {
       // deleção com erro
       res.statusCode = 500
       res.json({ msg: 'Ocorreu um erro ao deletar o usuário: ' + error })
+    }
+  }
+
+  async recoverPassword (req, res) {
+    try {
+      const { email } = req.body
+      const user = await User.findByEmail(email)
+      if (user.length > 0) {
+        const token = await PasswordToken.create(user[0])
+        res.statusCode = 200
+        res.json({ msg: 'Confira em seu email o token para recuperação de senha. Token: ' + token })
+      } else {
+        res.statusCode = 406
+        res.json({ msg: 'O email de usuário indicado não existe no banco de dados. ' })
+      }
+    } catch (error) {
+      res.statusCode = 500
+      res.json({ msg: 'Ocorreu um erro ao gerar a recuperação de senha: ' + error })
+    }
+  }
+
+  async changePassword (req, res) {
+    const { token, password } = req.body
+    res.utilized = false
+    try {
+      let result = await PasswordToken.findByToken(token)
+      if (result.length > 0) {
+        result = result[0]
+        if (result.used) {
+          res.statusCode = 403
+          res.json({ msg: 'O token inserido para a recuperação de senha já foi anteriormente utilizado. ' })
+        } else {
+          userValidation.password(password, res)
+          if (res.utilized) {
+            return
+          }
+          const hash = await bcrypt.hash(password, salt)
+          await User.changePassword(hash, result.user_id)
+          await PasswordToken.setUsed(token)
+          res.statusCode = 200
+          res.json({ msg: 'Senha modificada. ' })
+        }
+      } else {
+        res.statusCode = 406
+        res.json({ msg: 'O token inserido para a recuperação de senha é invalido. ' })
+      }
+    } catch (error) {
+      res.statusCode = 500
+      res.json({ msg: 'Ocorreu um erro ao recuperar a senha: ' + error })
     }
   }
 
