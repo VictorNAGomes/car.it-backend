@@ -58,7 +58,11 @@ class User {
 
   async findUserWithAddress (id) {
     const result = await knex.select().table('users as u').innerJoin('adresses', 'adresses.user_id', 'u.id').whereRaw('u.id = ' + id)
-    console.log(result)
+    return result
+  }
+
+  async findAllOrderByRating () {
+    const result = await knex.select().table('users').orderBy('rating', 'desc')
     return result
   }
 

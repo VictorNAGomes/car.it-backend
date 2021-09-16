@@ -353,28 +353,44 @@ class UserController {
   }
 
   async login (req, res) {
-    const { email, password } = req.body
+    try {
+      const { email, password } = req.body
 
-    userValidation.email(email, res)
-    if (res.utilized) {
-      return
-    }
+      userValidation.email(email, res)
+      if (res.utilized) {
+        return
+      }
 
-    let user = await User.findByEmail(email)
-    user = user[0]
-    if (user !== undefined) {
-      const result = await bcrypt.compare(password, user.password)
-      if (result) {
-        const token = JWT.sign({ email: email }, secretJwt)
-        res.statusCode = 200
-        res.json({ token: token })
+      let user = await User.findByEmail(email)
+      user = user[0]
+      if (user !== undefined) {
+        const result = await bcrypt.compare(password, user.password)
+        if (result) {
+          const token = JWT.sign({ email: email }, secretJwt)
+          res.statusCode = 200
+          res.json({ token: token })
+        } else {
+          res.statusCode = 406
+          res.json({ msg: 'Credenciais inválidas. ' })
+        }
       } else {
         res.statusCode = 406
         res.json({ msg: 'Credenciais inválidas. ' })
       }
-    } else {
-      res.statusCode = 406
-      res.json({ msg: 'Credenciais inválidas. ' })
+    } catch (error) {
+      res.statusCode = 500
+      res.json({ msg: 'Ocorreu um erro ao realizar o login: ' + error })
+    }
+  }
+
+  async findAllOrderByRating (req, res) {
+    try {
+      const result = await User.findAllOrderByRating()
+      res.statusCode = 200
+      res.json(result)
+    } catch (error) {
+      res.statusCode = 500
+      res.json({ msg: 'Ocorreu um erro ao requisitar todos os usuários: ' + error })
     }
   }
 }
