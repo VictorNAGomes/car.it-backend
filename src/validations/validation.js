@@ -65,8 +65,8 @@ const userValidation = {
       return false
     }
   },
-  cpfCnpj: (cpfCnpj, res) => {
-    if (cpfCnpj === undefined || utils.isEmpty(cpfCnpj) || !utils.isValidLength(cpfCnpj, 11)) {
+  cpfCnpj: (cpfCnpj, res, str) => {
+    if (cpfCnpj === undefined || utils.isEmpty(cpfCnpj)) {
       res.statusCode = 406
       res.json({
         status: false,
@@ -82,11 +82,19 @@ const userValidation = {
       })
       res.utilized = true
       return false
-    } else if (!utils.isValidMaxLength(cpfCnpj, 14)) {
+    } else if (str === 'cpf' && !utils.isValidLength(cpfCnpj, 11)) {
       res.statusCode = 406
       res.json({
         status: false,
-        msg: 'O CPF/CNPJ deve conter no máximo 14 números. '
+        msg: 'O CPF deve conter 11 números. '
+      })
+      res.utilized = true
+      return false
+    } else if (str === 'cnpj' && !utils.isValidLength(cpfCnpj, 14)) {
+      res.statusCode = 406
+      res.json({
+        status: false,
+        msg: 'O CNPJ deve conter 14 números. '
       })
       res.utilized = true
       return false

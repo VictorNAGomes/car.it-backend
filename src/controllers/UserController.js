@@ -135,116 +135,79 @@ class UserController {
     }
 
     user = user[0]
-    const newUser = {}
-    const newAddress = {}
     const { name = user.name, phone = user.phone, email = user.email, cpf = user.cpf, cnpj = user.cnpj, cep = user.cep, state = user.state, city = user.city, district = user.district, road = user.road, complement = user.complement } = req.body
+    const newUser = {
+      name,
+      phone,
+      email,
+      cpf,
+      cnpj
+    }
+    const newAddress = {
+      cep,
+      state,
+      city,
+      district,
+      road,
+      complement
+    }
 
     // VALIDACOES
     res.utilized = false
-    if (name !== undefined) {
+    if (name !== user.name) {
       userValidation.name(name, res)
-      if (res.utilized === false) {
-        newUser.name = name
-      } else {
+      if (res.utilized) {
         return
       }
-    } else {
-      newUser.name = user.name
     }
 
-    if (phone !== undefined) {
-      newUser.phone = phone
-    } else {
-      newUser.phone = user.phone
-    }
-
-    if (email !== undefined) {
+    if (email !== user.email) {
       userValidation.email(email, res)
-      if (res.utilized === false) {
-        newUser.email = email
-      } else {
+      if (res.utilized) {
         return
       }
-    } else {
-      newUser.email = user.email
     }
 
-    if (cpf !== undefined && cpf !== null) {
-      userValidation.cpfCnpj(cpf, res)
-      if (res.utilized === false) {
-        newUser.cpf = cpf
-      } else {
+    if (cpf !== user.cpf && cpf !== null) {
+      userValidation.cpfCnpj(cpf, res, 'cpf')
+      if (res.utilized) {
         return
       }
-    } else {
-      newUser.cpf = user.cpf
     }
 
-    if (cnpj !== undefined && cnpj !== null) {
-      userValidation.cpfCnpj(cnpj, res)
-      if (res.utilized === false) {
-        newUser.cnpj = cnpj
-      } else {
+    if (cnpj !== user.cnpj && cnpj !== null) {
+      userValidation.cpfCnpj(cnpj, res, 'cnpj')
+      if (res.utilized) {
         return
       }
-    } else {
-      newUser.cnpj = user.cnpj
     }
 
-    if (cep !== undefined) {
+    if (cep !== user.cep) {
       userValidation.cep(cep, res)
-      if (res.utilized === false) {
-        newAddress.cep = cep
-      } else {
+      if (res.utilized) {
         return
       }
-    } else {
-      newAddress.cep = user.cep
     }
 
-    if (state !== undefined) {
+    if (state !== user.state) {
       userValidation.state(state, res)
-      if (res.utilized === false) {
-        newAddress.state = state
-      } else {
+      if (res.utilized) {
         return
       }
-    } else {
-      newAddress.state = user.state
     }
 
-    if (city !== undefined) {
+    if (city !== user.city) {
       userValidation.city(city, res)
-      if (res.utilized === false) {
-        newAddress.city = city
-      } else {
+      if (res.utilized) {
         return
       }
-    } else {
-      newAddress.city = user.city
     }
 
-    if (district !== undefined) {
-      newAddress.district = district
-    } else {
-      newAddress.district = user.district
-    }
-
-    if (road !== undefined) {
+    if (road !== user.road) {
       userValidation.road(road, res)
-      if (res.utilized === false) {
-        newAddress.road = road
-      } else {
+      if (res.utilized) {
         return
       }
-    } else {
-      newAddress.road = user.road
-    }
-
-    if (complement !== undefined) {
-      newAddress.complement = complement
-    } else {
-      newAddress.complement = user.complement
     }
 
     try {
@@ -256,7 +219,7 @@ class UserController {
       await User.updateAddress(id, newAddress)
 
       // printar o usuario com o respectivo endereco
-      const userResult = await User.findById(id)
+      const userResult = await User.findOneWithAddress(id)
       res.statusCode = 200
       res.json({ msg: 'Usuário atualizado. ', user: userResult })
     } catch (error) {
