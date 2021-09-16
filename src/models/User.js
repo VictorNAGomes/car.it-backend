@@ -21,6 +21,11 @@ class User {
     return result
   }
 
+  async updateRating (id, rating) {
+    const result = await knex.where({ id: id }).update({ rating: rating }).table('users')
+    return result
+  }
+
   async delete (id) {
     const result = await knex.delete().table('users').where({ id: id })
     return result
@@ -56,7 +61,7 @@ class User {
     return result
   }
 
-  async findUserWithAddress (id) {
+  async findOneWithAddress (id) {
     const result = await knex.select().table('users as u').innerJoin('adresses', 'adresses.user_id', 'u.id').whereRaw('u.id = ' + id)
     return result
   }
@@ -66,8 +71,13 @@ class User {
     return result
   }
 
-  async findUsersWithAddress () {
+  async findAllWithAddress () {
     const result = await knex.select().table('users').innerJoin('adresses', 'adresses.user_id', 'users.id')
+    return result
+  }
+
+  async findByIdWithVehicles (id) {
+    const result = await knex.select('u.id as userId', 'v.id as vehicleId').table('users as u').innerJoin('vehicles as v', 'v.user_id', 'u.id').whereRaw('u.id = ' + id)
     return result
   }
 }

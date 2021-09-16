@@ -9,13 +9,14 @@ router.get('/', (req, res) => {
   res.send('aaa')
 })
 
-router.post('/user', UserController.create)
 router.get('/users', UserController.findAll)
 router.get('/user/:id', UserController.findById)
 router.get('/users/rating', UserController.findAllOrderByRating)
 // user/vehicles
+router.patch('/user/:id/rating', UserController.updateRating)
 router.put('/user/:id', UserController.update)
 router.delete('/user/:id', UserController.delete)
+router.post('/user', UserController.create)
 router.post('/login', UserController.login)
 router.post('/recoverPassword', UserController.recoverPassword)
 router.post('/changePassword', UserController.changePassword)

@@ -79,7 +79,7 @@ class UserController {
   async findAll (req, res) {
     // traz todos os usuários com seus enderecos
     try {
-      const users = await User.findUsersWithAddress()
+      const users = await User.findAllWithAddress()
       res.statusCode = 200
       res.json(users)
     } catch (error) {
@@ -101,7 +101,7 @@ class UserController {
       }
 
       // se o ID do usuário não existir no banco de dados
-      const user = await User.findUserWithAddress(id)
+      const user = await User.findOneWithAddress(id)
       if (user.length === 0) {
         res.statusCode = 406
         res.json({ msg: 'O ID de usuário indicado não existe no banco de dados. ' })
@@ -127,7 +127,7 @@ class UserController {
     }
 
     // se o ID do usuário não existir no banco de dados
-    let user = await User.findUserWithAddress(id)
+    let user = await User.findOneWithAddress(id)
     if (user.length === 0) {
       res.statusCode = 406
       res.json({ msg: 'O ID de usuário indicado não existe no banco de dados. ' })
@@ -137,7 +137,7 @@ class UserController {
     user = user[0]
     const newUser = {}
     const newAddress = {}
-    const { name, phone, email, cpf, cnpj, cep, state, city, district, road, complement } = req.body
+    const { name = user.name, phone = user.phone, email = user.email, cpf = user.cpf, cnpj = user.cnpj, cep = user.cep, state = user.state, city = user.city, district = user.district, road = user.road, complement = user.complement } = req.body
 
     // VALIDACOES
     res.utilized = false
@@ -266,6 +266,41 @@ class UserController {
     }
   }
 
+  async updateRating (req, res) {
+    try {
+      const { id } = req.params
+      const { rating } = req.body
+      res.utilized = false
+
+      // se o parâmetro não for um numero
+      if (!Number(id)) {
+        res.statusCode = 406
+        res.json({ msg: 'O parâmetro passado precisa ser um número. ' })
+        return
+      }
+
+      // se o id não existir
+      const result = await User.findById(id)
+      if (result.length === 0) {
+        res.statusCode = 406
+        res.json({ msg: 'O ID de usuário indicado não existe no banco de dados. ' })
+        return
+      }
+
+      userValidation.rating(rating, res)
+      if (res.utilized) {
+        return
+      }
+
+      await User.updateRating(id, rating)
+      res.statusCode = 200
+      res.json({ msg: 'Rating do usuário atualizado. ' })
+    } catch (error) {
+      res.statusCode = 500
+      res.json({ msg: 'Ocorreu um erro ao atualizar o rating do usuário: ' + error })
+    }
+  }
+
   async delete (req, res) {
     const { id } = req.params
 
@@ -391,6 +426,34 @@ class UserController {
     } catch (error) {
       res.statusCode = 500
       res.json({ msg: 'Ocorreu um erro ao requisitar todos os usuários: ' + error })
+    }
+  }
+
+  async findByIdWithVehicles (req, res) {
+    const { id } = req.params
+
+    // se o parâmetro não for um numero
+    if (!Number(id)) {
+      res.statusCode = 406
+      res.json({ msg: 'O parâmetro passado precisa ser um número. ' })
+      return
+    }
+
+    // se o id não existir
+    const result = await User.findById(id)
+    if (result.length === 0) {
+      res.statusCode = 406
+      res.json({ msg: 'O ID de usuário indicado não existe no banco de dados. ' })
+      return
+    }
+
+    try {
+      const userVehicles = await User.findByIdWithVehicles(id)
+      res.statusCode = 200
+      res.json(userVehicles)
+    } catch (error) {
+      res.statusCode = 500
+      res.json({ msg: 'Ocorreu um erro ao requisitar os veículos do usuário: ' + error })
     }
   }
 }
