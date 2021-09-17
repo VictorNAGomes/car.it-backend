@@ -82,7 +82,7 @@ const userValidation = {
       })
       res.utilized = true
       return false
-    } else if (str === 'cpf' && !utils.isValidLength(cpfCnpj, 11)) {
+    } else if (str === 'cpf' && !utils.isValidMaxLength(cpfCnpj, 11)) {
       res.statusCode = 406
       res.json({
         status: false,
@@ -90,7 +90,7 @@ const userValidation = {
       })
       res.utilized = true
       return false
-    } else if (str === 'cnpj' && !utils.isValidLength(cpfCnpj, 14)) {
+    } else if (str === 'cnpj' && !utils.isValidMaxLength(cpfCnpj, 14)) {
       res.statusCode = 406
       res.json({
         status: false,

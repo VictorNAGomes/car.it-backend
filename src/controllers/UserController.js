@@ -135,7 +135,13 @@ class UserController {
     }
 
     user = user[0]
-    const { name = user.name, phone = user.phone, email = user.email, cpf = user.cpf, cnpj = user.cnpj, cep = user.cep, state = user.state, city = user.city, district = user.district, road = user.road, complement = user.complement } = req.body
+    let { name = user.name, phone = user.phone, email = user.email, cpf = user.cpf, cnpj = user.cnpj, cep = user.cep, state = user.state, city = user.city, district = user.district, road = user.road, complement = user.complement } = req.body
+    if (cpf === null) {
+      cpf = user.cpf
+    }
+    if (cnpj === null) {
+      cnpj = user.cnpj
+    }
     const newUser = {
       name,
       phone,
@@ -173,11 +179,23 @@ class UserController {
       if (res.utilized) {
         return
       }
+      const cpfExists = await User.findByCpf(cpf)
+      if (cpfExists.length > 0) {
+        res.statusCode = 406
+        res.json({ msg: 'O CPF já foi cadastrado anteriormente no sistema. ' })
+        return
+      }
     }
 
     if (cnpj !== user.cnpj && cnpj !== null) {
       userValidation.cpfCnpj(cnpj, res, 'cnpj')
       if (res.utilized) {
+        return
+      }
+      const cnpjExists = await User.findByCnpj(cnpj)
+      if (cnpjExists.length > 0) {
+        res.statusCode = 406
+        res.json({ msg: 'O CNPJ já foi cadastrado anteriormente no sistema. ' })
         return
       }
     }
