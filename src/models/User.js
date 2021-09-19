@@ -26,6 +26,11 @@ class User {
     return result
   }
 
+  async updateCode (id, code) {
+    const result = await knex.where({ id: id }).update({ codeToVerify: code }).table('users')
+    return result
+  }
+
   async delete (id) {
     const result = await knex.delete().table('users').where({ id: id })
     return result

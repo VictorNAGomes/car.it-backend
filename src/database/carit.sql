@@ -13,6 +13,7 @@ create table users (
     cpf char(11) unique,
     cnpj char(14) unique,
     rating decimal(2, 1) not null,
+    codeToVerify char(6) default "000000",
     createdAt datetime not null default now(),
     editedAt datetime
 ) CHARACTER SET utf8 COLLATE utf8_general_ci;
@@ -40,6 +41,7 @@ create table passwordTokens (
         on update cascade
         on delete cascade
 ) CHARACTER SET utf8 COLLATE utf8_general_ci;
+
 
 create table vehicles(
     id int not null primary key auto_increment,

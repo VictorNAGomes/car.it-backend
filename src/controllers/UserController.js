@@ -9,6 +9,21 @@ const salt = bcrypt.genSaltSync(10)
 
 const secretJwt = process.env.JWT_SECRET
 
+const generate = n => {
+  const add = 1
+  let max = 12 - add // 12 is the min safe number Math.random() can generate without it starting to pad the end with zeros.
+
+  if (n > max) {
+    return generate(max) + generate(n - max)
+  }
+
+  max = Math.pow(10, n + add)
+  const min = max / 10 // Math.pow(10, n) basically
+  const number = Math.floor(Math.random() * (max - min + 1)) + min
+
+  return ('' + number).substring(add)
+}
+
 class UserController {
   async create (req, res) {
     try {
@@ -430,11 +445,53 @@ class UserController {
 
     try {
       const userVehicles = await User.findByIdWithVehicles(id)
+      const user = {
+        id: userVehicles[0].userId,
+        vehicles: []
+      }
+      userVehicles.forEach(vehicle => {
+        user.vehicles.push({ id: vehicle.vehicleId })
+      })
+
+      console.log(user)
       res.statusCode = 200
-      res.json(userVehicles)
+      res.json(user)
     } catch (error) {
       res.statusCode = 500
       res.json({ msg: 'Ocorreu um erro ao requisitar os veículos do usuário: ' + error })
+    }
+  }
+
+  async sendEmailToVerify (req, res) {
+    try {
+      const { email } = req.body
+      let user = await User.findByEmail(email)
+      if (user.length > 0) {
+        user = user[0]
+        console.log(user.codeToVerify)
+        if (user.codeToVerify !== '000000') {
+          res.statusCode = 406
+          res.json({ msg: 'Um código para a recuperação de senha já foi enviado para esse email.  ' })
+          return
+        }
+        const code = generate(6)
+        const message = await transporter.sendMail({
+          from: 'Marcos Almeida <markosalmeidaa@gmail.com>',
+          to: email,
+          subject: 'Código para validação de email. ',
+          text: 'Aqui está o seu código para validação de email: ' + code + '; Utilize-o apenas uma vez. '
+        })
+        await User.updateCode(user.id, code)
+        console.log(message)
+        res.statusCode = 200
+        res.json({ msg: 'Confira em seu email o código para validação. ' })
+      } else {
+        res.statusCode = 406
+        res.json({ msg: 'O email de usuário indicado não existe no banco de dados. ' })
+      }
+    } catch (error) {
+      res.statusCode = 500
+      res.json({ msg: 'Ocorreu um erro ao gerar a verificação de email: ' + error })
     }
   }
 }

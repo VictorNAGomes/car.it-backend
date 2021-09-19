@@ -12,7 +12,7 @@ router.get('/', (req, res) => {
 router.get('/users', UserController.findAll)
 router.get('/user/:id', UserController.findById)
 router.get('/users/rating', UserController.findAllOrderByRating)
-// user/vehicles
+router.get('/user/:id/vehicles', UserController.findByIdWithVehicles)
 router.patch('/user/:id/rating', UserController.updateRating)
 router.put('/user/:id', UserController.update)
 router.delete('/user/:id', UserController.delete)
@@ -20,6 +20,8 @@ router.post('/user', UserController.create)
 router.post('/login', UserController.login)
 router.post('/recoverPassword', UserController.recoverPassword)
 router.post('/changePassword', UserController.changePassword)
+router.post('/user/emailToVerify', UserController.sendEmailToVerify)
+// router.post('/user/verifyEmail', UserController.verifyEmail)
 
 router.post('/vehicle', VehicleController.create)
 router.get('/vehicles', VehicleController.findAll)
