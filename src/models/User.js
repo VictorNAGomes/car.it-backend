@@ -85,6 +85,16 @@ class User {
     const result = await knex.select('u.id as userId', 'v.id as vehicleId').table('users as u').innerJoin('vehicles as v', 'v.user_id', 'u.id').whereRaw('u.id = ' + id)
     return result
   }
+
+  async verifyEmail (email) {
+    const result = await knex.where({ email: email }).update({ verified: 1, codeToVerify: '000000' }).table('users')
+    return result
+  }
+
+  async setUnverified (id) {
+    const result = await knex.where({ id: id }).update({ verified: 0, codeToVerify: '000000' }).table('users')
+    return result
+  }
 }
 
 module.exports = new User()
