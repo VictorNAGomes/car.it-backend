@@ -57,6 +57,12 @@ class Vehicle {
 
     return vehicle
   }
+
+  async findCars () {
+    const vehicles = await knex.select().table('vehicles').where({ vehicleType: 'Carro' })
+
+    return vehicles
+  }
 }
 
 module.exports = new Vehicle()
