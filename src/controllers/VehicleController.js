@@ -244,9 +244,26 @@ class VehicleController {
     }
   }
 
-  async findCars (req, res) {
+  async findAllCars (req, res) {
     try {
-      const vehicles = await Vehicle.findCars()
+      const vehicles = await Vehicle.findAllCars()
+
+      if (vehicles.length > 0) {
+        res.statusCode = 200
+        res.json({ vehicles })
+      } else {
+        res.statusCode = 404
+        res.json({ msg: 'Não há carros cadastrados ainda' })
+      }
+    } catch (err) {
+      res.statusCode = 500
+      res.json({ msg: 'Ocorreu um erro: ' + err })
+    }
+  }
+
+  async findAllMotorcycles (req, res) {
+    try {
+      const vehicles = await Vehicle.findAllMotorcycles()
 
       if (vehicles.length > 0) {
         res.statusCode = 200

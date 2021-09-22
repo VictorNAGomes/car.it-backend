@@ -58,8 +58,14 @@ class Vehicle {
     return vehicle
   }
 
-  async findCars () {
+  async findAllCars () {
     const vehicles = await knex.select().table('vehicles').where({ vehicleType: 'Carro' })
+
+    return vehicles
+  }
+
+  async findAllMotorcycles () {
+    const vehicles = await knex.select().table('vehicles').where({ vehicleType: 'Moto' })
 
     return vehicles
   }
