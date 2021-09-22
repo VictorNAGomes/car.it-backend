@@ -30,5 +30,6 @@ router.put('/vehicle/:id', VehicleController.update)
 router.delete('/vehicle/:id', VehicleController.delete)
 router.get('/vehicles/cars', VehicleController.findAllCars)
 router.get('/vehicles/motorcycles', VehicleController.findAllMotorcycles)
+router.get('/vehicles/categories', VehicleController.findWithCategories)
 
 module.exports = router

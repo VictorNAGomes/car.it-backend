@@ -270,7 +270,64 @@ class VehicleController {
         res.json({ vehicles })
       } else {
         res.statusCode = 404
-        res.json({ msg: 'Não há carros cadastrados ainda' })
+        res.json({ msg: 'Não há motos cadastradas ainda' })
+      }
+    } catch (err) {
+      res.statusCode = 500
+      res.json({ msg: 'Ocorreu um erro: ' + err })
+    }
+  }
+
+  async findWithCategories (req, res) {
+    try {
+      const { model, brand, vehicleType, conservationState, steering, transmission, doors, fuel } = req.body
+      res.utilized = false
+      const categories = {}
+
+      if (model !== undefined) {
+        vehicleValidation.string(model, res, 'Modelo')
+        categories.model = model
+      }
+      if (brand !== undefined) {
+        vehicleValidation.string(brand, res, 'Marca')
+        categories.brand = brand
+      }
+      if (vehicleType !== undefined) {
+        vehicleValidation.string(vehicleType, res, 'Tipo de veículo')
+        categories.vehicleType = vehicleType
+      }
+      if (conservationState !== undefined) {
+        vehicleValidation.string(conservationState, res, 'Estado de conservação')
+        categories.conservationState = conservationState
+      }
+      if (steering !== undefined) {
+        vehicleValidation.string(steering, res, 'Direção')
+        categories.steering = steering
+      }
+      if (transmission !== undefined) {
+        vehicleValidation.string(transmission, res, 'Transmissão')
+        categories.transmission = transmission
+      }
+      if (doors !== undefined) {
+        const doorString = doors.toString()
+        vehicleValidation.number(doorString, res, 1, 'Porta')
+        categories.doors = doors
+      }
+      if (fuel !== undefined) {
+        vehicleValidation.string(fuel, res, 'Combústivel')
+        categories.fuel = fuel
+      }
+
+      if (res.utilized === false) {
+        const vehicles = await Vehicle.findWithCategories(categories)
+
+        if (vehicles.length > 0) {
+          res.statusCode = 200
+          res.json({ vehicles })
+        } else {
+          res.statusCode = 404
+          res.json({ msg: 'Nenhum veículo encontrado' })
+        }
       }
     } catch (err) {
       res.statusCode = 500
