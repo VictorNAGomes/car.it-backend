@@ -14,7 +14,7 @@ class VehicleController {
       vehicleValidation.year(year, res)
       vehicleValidation.string(vehicleType, res, 'Tipo de veículo')
       vehicleValidation.string(conservationState, res, 'Estado de conservação')
-      vehicleValidation.number(priceString, res, 11, 'Preço')
+      vehicleValidation.number(priceString, res, 9, 'Preço')
       vehicleValidation.string(steering, res, 'Direção')
       vehicleValidation.string(transmission, res, 'Transmissão')
       vehicleValidation.number(doorString, res, 1, 'Porta')
@@ -168,7 +168,7 @@ class VehicleController {
         }
         if (price !== undefined) {
           const priceString = price.toString()
-          vehicleValidation.number(priceString, res, 11, 'Preço')
+          vehicleValidation.number(priceString, res, 9, 'Preço')
           data.price = price
         }
         if (steering !== undefined) {
