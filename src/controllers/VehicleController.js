@@ -280,9 +280,11 @@ class VehicleController {
 
   async findWithCategories (req, res) {
     try {
-      const { model, brand, vehicleType, conservationState, steering, transmission, doors, fuel } = req.body
+      const { model, brand, vehicleType, conservationState, steering, transmission, doors, fuel, minPrice = 0, maxPrice = 999999999, minYear = 0, maxYear = 9999 } = req.body
       res.utilized = false
       const categories = {}
+      const price = {}
+      const year = {}
 
       if (model !== undefined) {
         vehicleValidation.string(model, res, 'Modelo')
@@ -317,9 +319,29 @@ class VehicleController {
         vehicleValidation.string(fuel, res, 'Combústivel')
         categories.fuel = fuel
       }
+      if (minPrice !== undefined) {
+        const minPriceString = minPrice.toString()
+        vehicleValidation.number(minPriceString, res, 9, ' Preço mínimo')
+        price.minPrice = minPrice
+      }
+      if (maxPrice !== undefined) {
+        const maxPriceString = maxPrice.toString()
+        vehicleValidation.number(maxPriceString, res, 9, 'Preço máximo')
+        price.maxPrice = maxPrice
+      }
+      if (minYear !== undefined) {
+        const minYearString = minYear.toString()
+        vehicleValidation.number(minYearString, res, 4, 'Ano mínimo')
+        year.minYear = minYear
+      }
+      if (maxYear !== undefined) {
+        const maxYearString = maxYear.toString()
+        vehicleValidation.number(maxYearString, res, 4, 'Ano máximo')
+        year.maxYear = maxYear
+      }
 
       if (res.utilized === false) {
-        const vehicles = await Vehicle.findWithCategories(categories)
+        const vehicles = await Vehicle.findWithCategories(categories, price, year)
 
         if (vehicles.length > 0) {
           res.statusCode = 200
