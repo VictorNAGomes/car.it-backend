@@ -21,8 +21,23 @@ class User {
     return result
   }
 
+  async updateRating (id, rating) {
+    const result = await knex.where({ id: id }).update({ rating: rating }).table('users')
+    return result
+  }
+
+  async updateCode (id, code) {
+    const result = await knex.where({ id: id }).update({ codeToVerify: code }).table('users')
+    return result
+  }
+
   async delete (id) {
     const result = await knex.delete().table('users').where({ id: id })
+    return result
+  }
+
+  async changePassword (password, id) {
+    const result = await knex.where({ id: id }).update({ password: password }).table('users')
     return result
   }
 
@@ -51,13 +66,33 @@ class User {
     return result
   }
 
-  async findUserWithAddress (id) {
-    const result = await knex.select().table('users').innerJoin('adresses', 'adresses.user_id', 'users.id').whereRaw('users.id = ' + id)
+  async findOneWithAddress (id) {
+    const result = await knex.select().table('users as u').innerJoin('adresses', 'adresses.user_id', 'u.id').whereRaw('u.id = ' + id)
     return result
   }
 
-  async findUsersWithAddress () {
+  async findAllOrderByRating () {
+    const result = await knex.select().table('users').orderBy('rating', 'desc')
+    return result
+  }
+
+  async findAllWithAddress () {
     const result = await knex.select().table('users').innerJoin('adresses', 'adresses.user_id', 'users.id')
+    return result
+  }
+
+  async findByIdWithVehicles (id) {
+    const result = await knex.select('u.id as userId', 'v.id as vehicleId').table('users as u').innerJoin('vehicles as v', 'v.user_id', 'u.id').whereRaw('u.id = ' + id)
+    return result
+  }
+
+  async verifyEmail (email) {
+    const result = await knex.where({ email: email }).update({ verified: 1, codeToVerify: '000000' }).table('users')
+    return result
+  }
+
+  async setUnverified (id) {
+    const result = await knex.where({ id: id }).update({ verified: 0, codeToVerify: '000000' }).table('users')
     return result
   }
 }

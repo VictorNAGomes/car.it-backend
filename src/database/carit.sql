@@ -13,6 +13,8 @@ create table users (
     cpf char(11) unique,
     cnpj char(14) unique,
     rating decimal(2, 1) not null,
+    codeToVerify char(6) default "000000",
+    verified tinyint default 0,
     createdAt datetime not null default now(),
     editedAt datetime
 ) CHARACTER SET utf8 COLLATE utf8_general_ci;
@@ -25,12 +27,22 @@ create table adresses (
     district varchar(100) not null,
     road varchar(100) not null,
     complement varchar(10) not null,
-    editedAt datetime,
     user_id int not null,
     constraint fk_address_user_id foreign key (user_id) references users(id) 
         on update cascade 
         on delete cascade
 ) CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+create table passwordTokens (
+    id int not null primary key auto_increment,
+    token varchar(200),
+    used tinyint default 0,
+    user_id int not null,
+    constraint fk_passwordTokens_user_id foreign key (user_id) references users(id)
+        on update cascade
+        on delete cascade
+) CHARACTER SET utf8 COLLATE utf8_general_ci;
+
 
 create table vehicles(
     id int not null primary key auto_increment,

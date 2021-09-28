@@ -2,7 +2,7 @@ const utils = {
   isEmpty: (str) => !str,
   isOnlyNumber: (str) => !str.match(/[^0-9]/),
   isValidLength: (str, length) => str.length >= length,
-  isValidMaxLength: (str, length) => str.length > length,
+  isValidMaxLength: (str, length) => str.length <= length,
   isValidEmail: (str) => /\S+@\S+.\S+/.test(str),
   isOnlyLetters: (str) => !str.match(/[^a-z ]/igm),
   isDoubleSpaced: (str) => str.match('  ') != null,
@@ -65,8 +65,8 @@ const userValidation = {
       return false
     }
   },
-  cpfCnpj: (cpfCnpj, res) => {
-    if (cpfCnpj === undefined || utils.isEmpty(cpfCnpj) || !utils.isValidLength(cpfCnpj, 11)) {
+  cpfCnpj: (cpfCnpj, res, str) => {
+    if (cpfCnpj === undefined || utils.isEmpty(cpfCnpj)) {
       res.statusCode = 406
       res.json({
         status: false,
@@ -82,18 +82,26 @@ const userValidation = {
       })
       res.utilized = true
       return false
-    } else if (utils.isValidMaxLength(cpfCnpj, 14)) {
+    } else if (str === 'cpf' && !utils.isValidMaxLength(cpfCnpj, 11)) {
       res.statusCode = 406
       res.json({
         status: false,
-        msg: 'O CPF/CNPJ deve conter no máximo 14 números. '
+        msg: 'O CPF deve conter 11 números. '
+      })
+      res.utilized = true
+      return false
+    } else if (str === 'cnpj' && !utils.isValidMaxLength(cpfCnpj, 14)) {
+      res.statusCode = 406
+      res.json({
+        status: false,
+        msg: 'O CNPJ deve conter 14 números. '
       })
       res.utilized = true
       return false
     }
   },
   cep: (cep, res) => {
-    if (cep === undefined || utils.isEmpty(cep) || !utils.isValidLength(cep, 8) || utils.isValidMaxLength(cep, 8)) {
+    if (cep === undefined || utils.isEmpty(cep) || !utils.isValidLength(cep, 8) || !utils.isValidMaxLength(cep, 8)) {
       res.statusCode = 406
       res.json({
         status: false,
@@ -106,6 +114,33 @@ const userValidation = {
       res.json({
         status: false,
         msg: 'O CEP deve conter apenas números. '
+      })
+      res.utilized = true
+      return false
+    }
+  },
+  rating: (rating, res) => {
+    if (rating === undefined || utils.isEmpty(rating) || !Number(rating)) {
+      res.statusCode = 406
+      res.json({
+        status: false,
+        msg: 'O rating deve ser numérico. '
+      })
+      res.utilized = true
+      return false
+    } else if (rating > 5) {
+      res.statusCode = 406
+      res.json({
+        status: false,
+        msg: 'O rating deve ser menor ou igual a 5. '
+      })
+      res.utilized = true
+      return false
+    } else if (rating < 0) {
+      res.statusCode = 406
+      res.json({
+        status: false,
+        msg: 'O rating deve ser maior ou igual a 0. '
       })
       res.utilized = true
       return false
@@ -135,7 +170,7 @@ const vehicleValidation = {
     }
   },
   year: (year, res) => {
-    if (!utils.isValidLength(year, 4) || utils.isValidMaxLength(year, 4)) {
+    if (!utils.isValidLength(year, 4) || !utils.isValidMaxLength(year, 4)) {
       res.statusCode = 406
       res.json({
         status: false,
@@ -145,7 +180,7 @@ const vehicleValidation = {
     }
   },
   number: (price, res, length, value) => {
-    if (utils.isValidMaxLength(price, length)) {
+    if (!utils.isValidMaxLength(price, length)) {
       res.statusCode = 406
       res.json({
         status: false,

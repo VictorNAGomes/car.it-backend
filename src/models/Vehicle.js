@@ -39,6 +39,46 @@ class Vehicle {
 
     return addAdditionals
   }
+
+  async deleteAdd (vehicleId) {
+    const additional = await knex.delete().table('vehicle_additional').where({ vehicle_id: vehicleId })
+
+    return additional
+  }
+
+  async update (data, id) {
+    const vehicle = await knex.update(data).table('vehicles').where({ id: id })
+
+    return vehicle
+  }
+
+  async delete (id) {
+    const vehicle = await knex.delete().table('vehicles').where({ id: id })
+
+    return vehicle
+  }
+
+  async findAllCars () {
+    const vehicles = await knex.select().table('vehicles').where({ vehicleType: 'Carro' })
+
+    return vehicles
+  }
+
+  async findAllMotorcycles () {
+    const vehicles = await knex.select().table('vehicles').where({ vehicleType: 'Moto' })
+
+    return vehicles
+  }
+
+  async findWithCategories (categories, price, year) {
+    const vehicles = await knex.select()
+      .table('vehicles')
+      .where(categories)
+      .whereRaw('price >= ? and price <= ?', [price.minPrice, price.maxPrice])
+      .whereRaw('year >= ? and year <= ?', [year.minYear, year.maxYear])
+
+    return vehicles
+  }
 }
 
 module.exports = new Vehicle()
