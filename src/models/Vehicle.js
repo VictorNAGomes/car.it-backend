@@ -70,12 +70,14 @@ class Vehicle {
     return vehicles
   }
 
-  async findWithCategories (categories, price, year) {
-    const vehicles = await knex.select()
+  async findWithCategories (categories, price, year, additionals) {
+    const vehicles = await knex.select('vehicles.*')
       .table('vehicles')
+      .leftJoin('vehicle_additional', 'vehicle_additional.id', 'vehicles.id')
       .where(categories)
       .whereRaw('price >= ? and price <= ?', [price.minPrice, price.maxPrice])
       .whereRaw('year >= ? and year <= ?', [year.minYear, year.maxYear])
+      .whereIn('additional_id', additionals)
 
     return vehicles
   }
