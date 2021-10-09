@@ -41,6 +41,16 @@ class User {
     return result
   }
 
+  async setFavorite (id, vehicleId) {
+    const result = await knex.insert({ user_id: id, vehicle_id: vehicleId }).table('favorites')
+    return result
+  }
+
+  async unsetFavorite (id, vehicleId) {
+    const result = await knex.delete().table('favorites').whereRaw('user_id = ' + id + ' and vehicle_id = ' + vehicleId)
+    return result
+  }
+
   async findAll () {
     const result = await knex.select().table('users')
     return result
@@ -83,6 +93,16 @@ class User {
 
   async findByIdWithVehicles (id) {
     const result = await knex.select('u.id as userId', 'v.id as vehicleId').table('users as u').innerJoin('vehicles as v', 'v.user_id', 'u.id').whereRaw('u.id = ' + id)
+    return result
+  }
+
+  async findFavorites (id) {
+    const result = await knex.select('u.id as userId', 'v.id as vehicleId').from(knex.raw('users as u, vehicles as v, favorites as f')).whereRaw('? = u.id and u.id = f.user_id and f.vehicle_id = v.id', [id])
+    return result
+  }
+
+  async findOneFavorite (id, vehicleId) {
+    const result = await knex.select('u.id as userId', 'v.id as vehicleId').from(knex.raw('users as u, vehicles as v, favorites as f')).whereRaw('? = u.id and u.id = f.user_id and f.vehicle_id = v.id and v.id = ?', [id, vehicleId])
     return result
   }
 

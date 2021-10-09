@@ -43,7 +43,6 @@ create table passwordTokens (
         on delete cascade
 ) CHARACTER SET utf8 COLLATE utf8_general_ci;
 
-
 create table vehicles(
     id int not null primary key auto_increment,
     model varchar(30) not null,
@@ -81,6 +80,18 @@ create table vehicle_additional(
         on update cascade 
         on delete cascade
 ) CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+create table favorites (
+    id int not null primary key auto_increment,
+    user_id int not null,
+    vehicle_id int not null,
+    constraint fk_favorites_user_id foreign key (user_id) references users(id)
+        on update cascade
+        on delete cascade,
+    constraint fk_favorites_vehicle_id foreign key (vehicle_id) references vehicles(id)
+        on update cascade
+        on delete cascade
+);
 
 insert into additionals (name) values
 ("Ar condicionado"),

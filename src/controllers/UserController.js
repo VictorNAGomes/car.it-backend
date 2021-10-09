@@ -1,4 +1,5 @@
 const User = require('../models/User')
+const Vehicle = require('../models/Vehicle')
 const bcrypt = require('bcrypt')
 const JWT = require('jsonwebtoken')
 const { userValidation } = require('../validations/validation')
@@ -103,6 +104,31 @@ class UserController {
       sendResponse(res, 200, users, true)
     } catch (error) {
       sendResponse(res, 500, 'Ocorreu um erro ao listar os usuários: ' + error)
+    }
+  }
+
+  async findFavorites (req, res) {
+    try {
+      const { id } = req.params
+
+      // se o usuário passar algo que não é um numero
+      if (!Number(id)) {
+        sendResponse(res, 406, 'O parâmetro passado precisa ser um número. ')
+        return
+      }
+
+      // se o ID do usuário não existir no banco de dados
+      const user = await User.findOneWithAddress(id)
+      if (user.length === 0) {
+        sendResponse(res, 406, 'O ID de usuário indicado não existe no banco de dados. ')
+        return
+      }
+
+      const result = await User.findFavorites(id)
+
+      sendResponse(res, 200, result, true)
+    } catch (error) {
+      sendResponse(res, 500, 'Ocorreu um erro ao listar o usuário: ' + error)
     }
   }
 
@@ -316,6 +342,43 @@ class UserController {
     } catch (error) {
       // deleção com erro
       sendResponse(res, 500, 'Ocorreu um erro ao deletar o usuário: ' + error)
+    }
+  }
+
+  async setOrUnsetFavorite (req, res) {
+    const { id, vehicleId } = req.body
+
+    // se o parâmetro não for um numero
+    if (!Number(id) || !Number(vehicleId)) {
+      sendResponse(res, 406, 'O parâmetro passado precisa ser um número. ')
+      return
+    }
+
+    // se o userid não existir
+    const resultUser = await User.findById(id)
+    if (resultUser.length === 0) {
+      sendResponse(res, 406, 'O ID de usuário indicado não existe no banco de dados. ')
+      return
+    }
+
+    // se o vehicleid não existir
+    const resultVehicle = await Vehicle.findById(vehicleId)
+    if (resultVehicle.length === 0) {
+      sendResponse(res, 406, 'O ID de veículo indicado não existe no banco de dados. ')
+      return
+    }
+
+    try {
+      const isFavorite = await User.findOneFavorite(id, vehicleId)
+      if (isFavorite.length === 0) {
+        await User.setFavorite(id, vehicleId)
+        sendResponse(res, 200, 'Favorido adicionado com sucesso. ID: ' + id + ', vehicleID: ' + vehicleId)
+      } else {
+        await User.unsetFavorite(id, vehicleId)
+        sendResponse(res, 200, 'Favorido removido com sucesso. ID: ' + id + ', vehicleID: ' + vehicleId)
+      }
+    } catch (error) {
+      sendResponse(res, 500, 'Ocorreu um erro ao (des)favoritar um veículo: ' + error)
     }
   }
 
