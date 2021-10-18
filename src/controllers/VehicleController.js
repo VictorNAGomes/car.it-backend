@@ -280,11 +280,12 @@ class VehicleController {
 
   async findWithCategories (req, res) {
     try {
-      const { model, brand, vehicleType, conservationState, steering, transmission, doors, fuel, minPrice = 0, maxPrice = 999999999, minYear = 0, maxYear = 9999 } = req.body
+      const { model, brand, vehicleType, conservationState, steering, transmission, doors, fuel, minPrice = 0, maxPrice = 999999999, minYear = 0, maxYear = 9999, additionals } = req.body
       res.utilized = false
       const categories = {}
       const price = {}
       const year = {}
+      const additionalCondition = []
 
       if (model !== undefined) {
         vehicleValidation.string(model, res, 'Modelo')
@@ -341,7 +342,12 @@ class VehicleController {
       }
 
       if (res.utilized === false) {
-        const vehicles = await Vehicle.findWithCategories(categories, price, year)
+        for (const add of additionals) {
+          const additional = await Vehicle.findAdditionalByName(add)
+          additionalCondition.push(additional[0].id)
+        }
+
+        const vehicles = await Vehicle.findWithCategories(categories, price, year, additionalCondition)
 
         if (vehicles.length > 0) {
           res.statusCode = 200
