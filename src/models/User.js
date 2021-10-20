@@ -1,4 +1,5 @@
 const knex = require('../database/database')
+const Vehicle = require('../models/Vehicle')
 
 class User {
   async create (data) {
@@ -92,12 +93,12 @@ class User {
   }
 
   async findByIdWithVehicles (id) {
-    const result = await knex.select('u.id as userId', 'v.id as vehicleId').table('users as u').innerJoin('vehicles as v', 'v.user_id', 'u.id').whereRaw('u.id = ' + id)
+    const result = await Vehicle.findAllCarsByUserId(id)
     return result
   }
 
   async findFavorites (id) {
-    const result = await knex.select('u.id as userId', 'v.id as vehicleId').from(knex.raw('users as u, vehicles as v, favorites as f')).whereRaw('? = u.id and u.id = f.user_id and f.vehicle_id = v.id', [id])
+    const result = await Vehicle.findAllCarsFavoritedById(id)
     return result
   }
 

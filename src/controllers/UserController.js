@@ -337,8 +337,6 @@ class UserController {
       // deleção do usuário
       await User.delete(id)
       sendResponse(res, 200, 'Usuário deletado. ID: ' + id)
-      res.statusCode = 200
-      res.json({ msg: 'Usuário deletado. ID: ' + id })
     } catch (error) {
       // deleção com erro
       sendResponse(res, 500, 'Ocorreu um erro ao deletar o usuário: ' + error)
@@ -385,6 +383,10 @@ class UserController {
   async recoverPassword (req, res) {
     try {
       const { email } = req.body
+
+      userValidation.email(email, res)
+      if (res.utilized) return
+
       const user = await User.findByEmail(email)
       if (user.length > 0) {
         const token = await PasswordToken.create(user[0])
@@ -436,9 +438,7 @@ class UserController {
       const { email, password } = req.body
 
       userValidation.email(email, res)
-      if (res.utilized) {
-        return
-      }
+      if (res.utilized) return
 
       let user = await User.findByEmail(email)
       user = user[0]
@@ -446,7 +446,7 @@ class UserController {
         const result = await bcrypt.compare(password, user.password)
         if (result) {
           const token = JWT.sign({ email: email }, secretJwt)
-          sendResponse(res, 200, { token: token }, true)
+          sendResponse(res, 200, { token: token, id: user.id }, true)
         } else {
           sendResponse(res, 406, 'Credenciais inválidas. ')
         }
@@ -485,14 +485,7 @@ class UserController {
 
     try {
       const userVehicles = await User.findByIdWithVehicles(id)
-      const user = {
-        id: userVehicles[0].userId,
-        vehicles: []
-      }
-      userVehicles.forEach(vehicle => {
-        user.vehicles.push({ id: vehicle.vehicleId })
-      })
-      sendResponse(res, 200, user, true)
+      sendResponse(res, 200, userVehicles, true)
     } catch (error) {
       sendResponse(res, 500, 'Ocorreu um erro ao requisitar os veículos do usuário: ' + error)
     }
