@@ -59,7 +59,52 @@ ___
 }
 ```
 
+<br>
+
 **O token de autenticação de login deve ser guardado no AUTHENTICATION, localizado no HEADERS da requisição e deve ser enviado em conjunto de toda requisição que o necessite**
+
+- **Forbidden 403** -> Se o usuário não enviar um token de login ou tentar modificar algo que não está ligado a sua conta receberá essa mensagem de erro **(VALE SOMENTE PARA REQUISIÇÕES QUE NECESSITAM DE TOKEN DE AUTENTICAÇÃO DE LOGIN)**
+
+```json
+{
+    "msg": "O cliente precisa estar logado para fazer essa requisição. "
+}
+```
+
+OU
+
+```json
+{
+    "msg": "O usuário está logado, porém está fazendo requisições em informações de outra conta. "
+}
+```
+
+<br>
+
+**Erros de sintaxe serão mostrados em retornos dados pelo sistema, e todas as rotas estão protegidas quanto a isso**
+
+- **Erros na sintaxe - 406** -> Existem invalidações nos dados enviados pelo usuário, que serão informados como nos exemplos abaixo
+
+```json
+{
+    "status": false,
+    "msg": "O email deve ter mais de 2 caracteres. "
+}
+```
+
+```json
+{
+    "status": false,
+    "msg": "A senha deve ter pelo menos 8 caracteres. "
+}
+```
+
+```json
+{
+    "status": false,
+    "msg": "O CPF/CNPJ deve conter apenas números. "
+}
+```
 
 <br><br>
 
@@ -83,7 +128,6 @@ O cliente **NÃO** precisa estar logado para realizar essa requisição
         "id": 1,
         "name": "Marcos Fajoli",
         "phone": "01514981010700",
-        "password": "$2b$10$nuY9miure4SxbDFqmDM67e/9WamJD/YSREGO6UKiVrK5UpLMRW2dq",
         "email": "marcos@gmail.com",
         ...
         "road": "Rua Acento Agudo",
@@ -94,7 +138,6 @@ O cliente **NÃO** precisa estar logado para realizar essa requisição
         "id": 2,
         "name": "Caue Almeida",
         "phone": "01514981010700",
-        "password": "$2b$10$nuY9miure4SxbDFqmDM67erj0ekyeIPISfxMvdn0UO9Ro5cjQpghq",
         "email": "caue@gmail.com",
         ...
         "road": "Rua Acento Circunflexo",
@@ -106,7 +149,6 @@ O cliente **NÃO** precisa estar logado para realizar essa requisição
         "id": 10,
         "name": "Mari Macedo",
         "phone": "01514981010700",
-        "password": "$2b$10$pfJxd866FSMS/Xbyb66gJ.ZkJcUtVzO1wEPAOfZhGVdArT4BIznJi",
         "email": "mari@gmail.com",
         ...
         "road": "Rua Acento Grave",
@@ -140,7 +182,6 @@ O cliente **NÃO** precisa estar logado para realizar essa requisição
         "id": 2,
         "name": "Caue Almeida",
         "phone": "01514981010700",
-        "password": "$2b$10$nuY9miure4SxbDFqmDM67erj0ekyeIPISfxMvdn0UO9Ro5cjQpghq",
         "email": "caue@gmail.com",
         ...
         "complement": "37",
@@ -229,22 +270,25 @@ O cliente **NÃO** precisa estar logado para realizar essa requisição
 
 #### Respostas
 
-- **OK 200** -> Retorna o ID do usuário indicado na requisição com os IDs dos seus veículos cadastrados
+- **OK 200** -> Retorna os veículos cadastrados pelo usuário indicado na requisição
 
 **GET /user/1/vehicles**
 
 ```json
-{
-    "id": 1,
-    "vehicles": [
-        {
-            "id": 1
-        },
-        {
-            "id": 2
-        }
-    ]
-}
+[
+    {
+        "id": 3,
+        "model": "Corolla",
+        ...
+        "user_id": 1
+    },
+    {
+        "id": 4,
+        "model": "Cadilac",
+        ...
+        "user_id": 1
+    }
+]
 ```
 
 <br>
@@ -285,31 +329,25 @@ O cliente **PRECISA** estar logado para realizar essa requisição
 
 #### Respostas
 
-- **OK 200** -> Retorna o ID do usuário indicado na requisição com os IDs dos seus veículos cadastrados
+- **OK 200** -> Retorna os veículos favoritados pelo usuário indicado na requisição
 
 **GET /user/1/favorites**
 
 ```json
 [
     {
-        "userId": 1,
-        "vehicleId": 1
+        "id": 3,
+        "model": "Corolla",
+        ...
+        "user_id": 4
     },
     {
-        "userId": 1,
-        "vehicleId": 2
+        "id": 4,
+        "model": "Audi",
+        ...
+        "user_id": 7
     }
 ]
-```
-
-<br>
-
-- **Forbidden 403** -> A requisição não enviou o token de autenticação de login ou ele é inválido
-
-```json
-{
-    "msg": "O cliente precisa estar logado para fazer essa requisição. "
-}
 ```
 
 <br>
@@ -436,16 +474,6 @@ O cliente **PRECISA** estar logado para realizar essa requisição
 
 <br>
 
-- **Forbidden 403** -> A requisição não enviou o token de autenticação de login ou ele é inválido
-
-```json
-{
-    "msg": "O cliente precisa estar logado para fazer essa requisição. "
-}
-```
-
-<br>
-
 - **Not Acceptable 406** -> Ocorreu um dos três erros abaixo
 
 **ERRO 01** -> O email indicado pelo usuário já existe no banco de dados
@@ -516,32 +544,6 @@ Bad Request 406
 }
 ```
 
-<br>
-
-- **Erros na sintaxe - 406** -> Existem invalidações nos dados enviados pelo usuário, que serão informados como nos exemplos abaixo
-
-Bad Request 406
-
-```json
-{
-    "status": false,
-    "msg": "O email deve ter mais de 2 caracteres. "
-}
-```
-
-```json
-{
-    "status": false,
-    "msg": "A senha deve ter pelo menos 8 caracteres. "
-}
-```
-
-```json
-{
-    "status": false,
-    "msg": "O CPF/CNPJ deve conter apenas números. "
-}
-```
 
 <br><br>
 
@@ -564,16 +566,6 @@ O cliente **PRECISA** estar logado para realizar essa requisição
 ```json
 {
     "msg": "Usuário deletado. ID: 1"
-}
-```
-
-<br>
-
-- **Forbidden 403** -> A requisição não enviou o token de autenticação de login ou ele é inválido
-
-```json
-{
-    "msg": "O cliente precisa estar logado para fazer essa requisição. "
 }
 ```
 
@@ -605,7 +597,7 @@ O parâmetro não é um número
 
 ### **POST /user**
 
-Este endpoint deleta os dados do usuário
+Este endpoint cria um usuário
 
 O cliente **NÃO** precisa estar logado para realizar essa requisição
 
@@ -738,32 +730,6 @@ Bad Request 406
 }
 ```
 
-<br>
-
-- **Erros na sintaxe - 406** -> Existem invalidações nos dados enviados pelo usuário, que serão informados como nos exemplos abaixo
-
-Bad Request 406
-
-```json
-{
-    "status": false,
-    "msg": "O email deve ter mais de 2 caracteres. "
-}
-```
-
-```json
-{
-    "status": false,
-    "msg": "A senha deve ter pelo menos 8 caracteres. "
-}
-```
-
-```json
-{
-    "status": false,
-    "msg": "O CPF/CNPJ deve conter apenas números. "
-}
-```
 
 <br><br>
 
@@ -806,7 +772,7 @@ O cliente **NÃO** precisa estar logado para realizar essa requisição
 
 <br><br>
 
-### **POST /user/recoverPassord**
+### **POST /user/recoverPassword**
 
 Este endpoint envia o token de recuperação de senha para o usuário
 
@@ -848,4 +814,4 @@ ___
 
 [Marcos Fajoli de Almeida](https://github.com/MarcosFajoli) -> Desenvolvedor back-end e aluno do último ano do curso de Desenvolvimento de Sistemas da ETEC Antonio Devisate
 
-[Victor Nathan Alves Gomes](https://github.com/MarcosFajoli) -> Desenvolvedor full-stack e aluno do último ano do curso de Desenvolvimento de Sistemas da ETEC Antonio Devisate
+[Victor Nathan Alves Gomes](https://github.com/VictorNAGomes) -> Desenvolvedor full-stack e aluno do último ano do curso de Desenvolvimento de Sistemas da ETEC Antonio Devisate

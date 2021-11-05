@@ -417,9 +417,8 @@ class UserController {
           sendResponse(res, 403, 'O token inserido para a recuperação de senha já foi anteriormente utilizado. ')
         } else {
           userValidation.password(password, res)
-          if (res.utilized) {
-            return
-          }
+          if (res.utilized) return
+
           const hash = await bcrypt.hash(password, salt)
           await User.changePassword(hash, result.user_id)
           await PasswordToken.setUsed(token)
@@ -526,6 +525,10 @@ class UserController {
   async verifyEmail (req, res) {
     try {
       let { code, email } = req.body
+
+      userValidation.email(email, res)
+      if (res.utilized) return
+
       code = code.toString()
       let user = await User.findByEmail(email)
       if (user.length > 0) {
@@ -533,7 +536,7 @@ class UserController {
         if (user.codeToVerify !== '000000') {
           if (user.codeToVerify === code) {
             await User.verifyEmail(email)
-            sendResponse(res, 200, 'Email verificado. Agora você pode fazer consultas antes não liberadas com essa conta. ')
+            sendResponse(res, 200, 'Email verificado. Agora você pode fazer requisiçÕes antes não liberadas com essa conta. ')
           } else {
             sendResponse(res, 406, 'O código de verificação inserido não condiz com o email informado. ')
           }
