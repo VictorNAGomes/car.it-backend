@@ -19,7 +19,7 @@ router.post('/user/recoverPassword', UserController.recoverPassword)
 router.post('/user/changePassword', UserController.changePassword)
 router.post('/user/emailToVerify', LoginAuth, UserController.sendEmailToVerify)
 router.post('/user/verifyEmail', LoginAuth, UserController.verifyEmail)
-router.post('/user/setOrUnsetFavorite', LoginAuth, UserController.setOrUnsetFavorite)
+router.post('/user/:id/setOrUnsetFavorite', LoginAuth, UserController.setOrUnsetFavorite)
 
 router.post('/vehicle', LoginAuth, VehicleController.create)
 router.get('/vehicles', VehicleController.findAll)

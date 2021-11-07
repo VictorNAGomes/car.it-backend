@@ -114,11 +114,11 @@ Este endpoint fornece a listagem de todos os usuários cadastrados no banco de d
 
 O cliente **NÃO** precisa estar logado para realizar essa requisição
 
-#### Parâmetros 
+#### **Parâmetros** 
 
 - Nenhum parâmetro é necessário.
 
-#### Respostas
+#### **Respostas**
 
 - **OK 200** -> Retorna todos os usuários cadastrados no sistema
 
@@ -166,11 +166,11 @@ Este endpoint fornece a listagem de um único usuário cadastrado no banco de da
 
 O cliente **NÃO** precisa estar logado para realizar essa requisição
 
-#### Parâmetros 
+#### **Parâmetros** 
 
 - O **ID** requisitado deve ser enviado pela URL.
 
-#### Respostas
+#### **Respostas**
 
 - **OK 200** -> Retorna o usuário indicado na requisição
 
@@ -224,11 +224,11 @@ Este endpoint fornece a listagem de todos os usuários cadastrados no banco de d
 
 O cliente **NÃO** precisa estar logado para realizar essa requisição
 
-#### Parâmetros 
+#### **Parâmetros** 
 
 - Nenhum parâmetro é necessário.
 
-#### Respostas
+#### **Respostas**
 
 - **OK 200** -> Retorna todos os usuários cadastrados no sistema ordenados pelo ***rating***
 
@@ -264,11 +264,11 @@ Este endpoint fornece a listagem de um único usuário cadastrado no banco de da
 
 O cliente **NÃO** precisa estar logado para realizar essa requisição
 
-#### Parâmetros 
+#### **Parâmetros** 
 
 - O **ID** requisitado deve ser enviado pela URL.
 
-#### Respostas
+#### **Respostas**
 
 - **OK 200** -> Retorna os veículos cadastrados pelo usuário indicado na requisição
 
@@ -323,11 +323,11 @@ Este endpoint fornece a listagem de um único usuário cadastrado no banco de da
 
 O cliente **PRECISA** estar logado para realizar essa requisição
 
-#### Parâmetros 
+#### **Parâmetros** 
 
 - O **ID** requisitado deve ser enviado pela URL.
 
-#### Respostas
+#### **Respostas**
 
 - **OK 200** -> Retorna os veículos favoritados pelo usuário indicado na requisição
 
@@ -382,7 +382,7 @@ Este endpoint modifica o rating do usuário indicado
 
 O cliente **NÃO** precisa estar logado para realizar essa requisição
 
-#### Parâmetros 
+#### **Parâmetros** 
 
 - O **ID** requisitado deve ser enviado pela URL.
 
@@ -394,7 +394,7 @@ O cliente **NÃO** precisa estar logado para realizar essa requisição
 }
 ```
 
-#### Respostas
+#### **Respostas**
 
 - **OK 200** -> Significa que o ***rating*** foi atualizado com sucesso.
 
@@ -436,7 +436,7 @@ Este endpoint modifica os dados do usuário
 
 O cliente **PRECISA** estar logado para realizar essa requisição
 
-#### Parâmetros 
+#### **Parâmetros** 
 
 - O **ID** requisitado deve ser enviado pela URL.
 
@@ -462,7 +462,7 @@ O cliente **PRECISA** estar logado para realizar essa requisição
 
 > ATENÇÃO: somente o CPF **OU** o CNPJ pode ser inserido, um dos dois deve ser omitido ou atribuido como null
 
-#### Respostas
+#### **Respostas**
 
 - **OK 200** -> O usuário foi atualizado
 
@@ -553,11 +553,11 @@ Este endpoint deleta os dados do usuário
 
 O cliente **PRECISA** estar logado para realizar essa requisição
 
-#### Parâmetros 
+#### **Parâmetros** 
 
 - O **ID** requisitado deve ser enviado pela URL.
 
-#### Respostas
+#### **Respostas**
 
 - **OK 200** -> O usuário foi deletado com sucesso
 
@@ -601,7 +601,7 @@ Este endpoint cria um usuário
 
 O cliente **NÃO** precisa estar logado para realizar essa requisição
 
-#### Parâmetros
+#### **Parâmetros**
 
 - O dados devem ser enviados através de um json, como o exemplo abaixo
 
@@ -621,7 +621,7 @@ O cliente **NÃO** precisa estar logado para realizar essa requisição
 }
 ```
 
-#### Respostas
+#### **Respostas**
 
 - **OK 200** -> O usuário foi cadastrado
 
@@ -739,7 +739,7 @@ Este endpoint realiza o login dos usuário
 
 O cliente **NÃO** precisa estar logado para realizar essa requisição
 
-#### Parâmetros
+#### **Parâmetros**
 
 - O dados devem ser enviados através de um json, como o exemplo abaixo
 
@@ -750,7 +750,7 @@ O cliente **NÃO** precisa estar logado para realizar essa requisição
 }
 ```
 
-#### Respostas
+#### **Respostas**
 
 - **OK 200** -> O login foi realizado
 
@@ -778,7 +778,7 @@ Este endpoint envia o token de recuperação de senha para o usuário
 
 O cliente **NÃO** precisa estar logado para realizar essa requisição
 
-#### Parâmetros
+#### **Parâmetros**
 
 - O email deve ser enviado através de um json
 
@@ -788,7 +788,7 @@ O cliente **NÃO** precisa estar logado para realizar essa requisição
 }
 ```
 
-#### Respostas
+#### **Respostas**
 
 - **OK 200** -> O token de recuperação de senha foi enviado para o email cadastrado do usuário
 
@@ -807,6 +807,212 @@ O cliente **NÃO** precisa estar logado para realizar essa requisição
     "msg": "O email de usuário indicado não existe no banco de dados. "
 }
 ```
+
+<br><br>
+
+### **POST /user/changePassword**
+
+Este endpoint recebe o token de recuperação e a nova senha do usuário
+
+O cliente **NÃO** precisa estar logado para realizar essa requisição
+
+#### **Parâmetros**
+
+- O token e a nova senha devem ser enviados através de um json
+
+```json
+{
+    "token": "DJDJHHojdfihefjwajfJIJWIJojaofjJfdJjfe",
+    "password": "estadominimo"
+}
+```
+
+#### **Respostas**
+
+- **OK 200** -> A senha foi modificada com sucesso
+
+```json
+{
+    "msg": "Senha modificada. "
+}
+```
+
+<br>
+
+- **Forbidden 403** -> O token de recuperação de senha já foi usado anteriormente
+
+```json
+{
+    "msg": "O token inserido para a recuperação de senha já foi anteriormente utilizado. "
+}
+```
+
+<br>
+
+- **Bad Request 406** -> O token inserido para a recuperação de senha é invalido
+
+```json
+{
+    "msg": "O token inserido para a recuperação de senha é invalido"
+}
+```
+
+<br><br>
+
+### **POST /user/emailToVerify**
+
+Este endpoint envia um código ao email do usuário para verificá-lo
+
+O cliente **PRECISA** estar logado para realizar essa requisição
+
+#### **Parâmetros**
+
+- O email do usuário deve ser enviado através de um json
+
+```json
+{
+    "email": "belle.u@gmail.com"
+}
+```
+
+#### **Respostas**
+
+- **OK 200** -> Uma mensagem de confirmação foi enviada para o email requisitado
+
+```json
+{
+    "msg": "Confira no email indicado o código para verificação. "
+}
+```
+
+<br>
+
+- **Bad Request 406** -> O código para a verificação já foi anteriormente enviado para esse email.  
+  
+```json
+{
+    "msg": "Um código para a verificação já foi enviado para esse email.  "
+}
+```
+
+<br>
+
+- **Bad Request 406** -> O email indicado já foi anteriormente verificado  
+  
+```json
+{
+    "msg": "O email do usuário indicado já foi verificado anteriormente. "
+}
+```
+
+<br>
+
+- **Bad Request 406** -> O email não existe no banco de dados  
+  
+```json
+{
+    "msg": "O email de usuário indicado não existe no banco de dados. "
+}
+```
+
+<br><br>
+
+### **POST /user/verifyEmail**
+
+Este endpoint verifica o email do usuário
+
+O cliente **PRECISA** estar logado para realizar essa requisição
+
+#### **Parâmetros**
+
+- O email e o código de verificação do usuário devem ser enviados através de um json
+
+```json
+{
+    "email": "belle.u@gmail.com",
+    "code": "549426"
+}
+```
+
+#### **Respostas**
+
+- **OK 200** -> O email foi verificado com sucesso
+
+```json
+{
+    "msg": "Email verificado. Agora você pode fazer requisiçÕes antes não liberadas com essa conta. "
+}
+```
+
+<br>
+
+- **Bad Request 406** -> O código inserido não se relaciona com o email indicado 
+  
+```json
+{
+    "msg": "O código de verificação inserido não condiz com o email informado. "
+}
+```
+
+<br>
+
+- **Bad Request 406** -> O email indicado ainda não recebeu um código de verificação
+  
+```json
+{
+    "msg": "O email de usuário indicado ainda não recebeu um código de verificação. "
+}
+```
+
+<br>
+
+- **Bad Request 406** -> O email indicado não existe no banco de dados
+  
+```json
+{
+    "msg": "O email de usuário indicado não existe no banco de dados. "
+}
+```
+
+<br><br>
+
+### **POST /user/setOrUnsetFavorite**
+
+Este endpoint (des)favorita um veículo indicado pelo usuário
+
+O cliente **PRECISA** estar logado para realizar essa requisição
+
+#### **Parâmetros**
+
+- O ID do usuário que está requisitando deve ser enviado pela URL e o ID do veículo através de um json
+
+POST /user/1/setOrUnsetFavorite
+
+```json
+{
+    "vehicleId": 1
+}
+```
+
+#### **Respostas**
+
+- **OK 200** -> Favorito adicionado com sucesso
+
+```json
+{
+    "msg": "Favorido adicionado com sucesso. ID: <id do usuário>, vehicleID: <id do veículo>"
+}
+```
+
+- **OK 200** -> Favorito removido com sucesso
+
+```json
+{
+    "msg": "Favorido removido com sucesso. ID: <id do usuário>, vehicleID: <id do veículo>"
+}
+```
+
+<br>
 
 ___
 

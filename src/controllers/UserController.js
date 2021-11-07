@@ -344,7 +344,8 @@ class UserController {
   }
 
   async setOrUnsetFavorite (req, res) {
-    const { id, vehicleId } = req.body
+    const { vehicleId } = req.body
+    const { id } = req.params
 
     // se o parâmetro não for um numero
     if (!Number(id) || !Number(vehicleId)) {
@@ -498,7 +499,7 @@ class UserController {
         user = user[0]
         if (!user.verified) {
           if (user.codeToVerify !== '000000') {
-            sendResponse(res, 406, 'Um código para a recuperação de senha já foi enviado para esse email.  ')
+            sendResponse(res, 406, 'Um código para a verificação já foi enviado para esse email.  ')
             return
           }
           const code = generate(6)
