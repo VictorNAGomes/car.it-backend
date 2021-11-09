@@ -3,11 +3,15 @@ const User = require('../models/User')
 const secretJwt = process.env.JWT_SECRET
 
 module.exports = async function (req, res, next) {
-  const idRequest = req.params.id
+  let idRequest = req.params.id
+
+  if (idRequest === null || idRequest === undefined) {
+    idRequest = req.body.userId
+  }
 
   if (!Number(idRequest)) {
     res.statusCode = 406
-    res.json({ msg: 'O parâmetro passado precisa ser um número. ' })
+    res.json({ msg: 'Autorização de login: parâmetro (id do usuário logado) passado precisa ser um número. ' })
     return
   }
 
@@ -15,7 +19,7 @@ module.exports = async function (req, res, next) {
   User.findById(idRequest).then((data) => {
     if (data.length === 0) {
       res.statusCode = 406
-      res.json({ msg: 'O ID de usuário indicado não existe no banco de dados. ' })
+      res.json({ msg: 'Autorização de login: parâmetro (id do usuário logado) não existe no banco de dados. ' })
     }
   })
 
