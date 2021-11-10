@@ -53,7 +53,7 @@ class User {
   }
 
   async findAll () {
-    const result = await knex.select().table('users')
+    const result = await knex.select('id', 'name', 'phone', 'email', 'cpf', 'cnpj', 'rating', 'verified', 'hasAddress').table('users')
     return result
   }
 
@@ -109,6 +109,11 @@ class User {
 
   async verifyEmail (email) {
     const result = await knex.where({ email: email }).update({ verified: 1, codeToVerify: '000000' }).table('users')
+    return result
+  }
+
+  async hasAddress (id) {
+    const result = await knex.where({ id: id }).update({ hasAddress: 1 }).table('users')
     return result
   }
 

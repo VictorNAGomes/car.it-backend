@@ -38,7 +38,7 @@ const sendResponse = (res, code, msg, isNotMessage = false) => {
 class UserController {
   async create (req, res) {
     try {
-      const { name, phone, password, email, cpfCnpj, cep, state, city, district, road, complement } = req.body
+      const { name, phone, password, email, cpfCnpj } = req.body
       let data = {}
       res.utilized = false
 
@@ -47,57 +47,102 @@ class UserController {
       userValidation.email(email, res)
       userValidation.password(password, res)
       userValidation.cpfCnpj(cpfCnpj, res)
-      userValidation.cep(cep, res)
-      userValidation.state(state, res)
-      userValidation.city(city, res)
-      userValidation.road(road, res)
 
       // se nenhuma validacao deu erro
-      if (res.utilized === false) {
-        const address = { cep, state, city, district, road, complement }
-        const emailExists = await User.findByEmail(email)
+      if (res.utilized) return
 
-        // se a consulta de email retornar algo
-        if (emailExists.length > 0) {
-          sendResponse(res, 406, 'O email já foi cadastrado anteriormente no sistema. ')
+      const emailExists = await User.findByEmail(email)
+
+      // se a consulta de email retornar algo
+      if (emailExists.length > 0) {
+        sendResponse(res, 406, 'O email já foi cadastrado anteriormente no sistema. ')
+        return
+      }
+
+      // se for cnpj
+      const hash = await bcrypt.hash(password, salt)
+      if (cpfCnpj.length > 11) {
+        const cnpjExists = await User.findByCnpj(cpfCnpj)
+
+        // se a consulta de cnpj retornar algo
+        if (cnpjExists.length > 0) {
+          sendResponse(res, 406, 'O CNPJ já foi cadastrado anteriormente no sistema. ')
           return
         }
+        // obj com o novo usuario já validado
+        data = { name, phone, password: hash, email, cpf: null, cnpj: cpfCnpj, rating: 0 }
+      } else { // se for cpf
+        const cpfExists = await User.findByCpf(cpfCnpj)
 
-        // se for cnpj
-        const hash = await bcrypt.hash(password, salt)
-        if (cpfCnpj.length > 11) {
-          const cnpjExists = await User.findByCnpj(cpfCnpj)
-
-          // se a consulta de cnpj retornar algo
-          if (cnpjExists.length > 0) {
-            sendResponse(res, 406, 'O CNPJ já foi cadastrado anteriormente no sistema. ')
-            return
-          }
-          // obj com o novo usuario já validado
-          data = { name, phone, password: hash, email, cpf: null, cnpj: cpfCnpj, rating: 0 }
-        } else { // se for cpf
-          const cpfExists = await User.findByCpf(cpfCnpj)
-
-          // se a consulta de cpf retornar algo
-          if (cpfExists.length > 0) {
-            sendResponse(res, 406, 'O CPF já foi cadastrado anteriormente no sistema. ')
-            return
-          }
-          // obj com o novo usuario já validado
-          data = { name, phone, password: hash, email, cpf: cpfCnpj, cnpj: null, rating: 0 }
+        // se a consulta de cpf retornar algo
+        if (cpfExists.length > 0) {
+          sendResponse(res, 406, 'O CPF já foi cadastrado anteriormente no sistema. ')
+          return
         }
-        // criacao de usuario de fato
-        const userId = await User.create(data)
-        await User.createAddress(address, userId)
-        sendResponse(res, 201, 'Usuário cadastrado. ID: ' + userId)
+        // obj com o novo usuario já validado
+        data = { name, phone, password: hash, email, cpf: cpfCnpj, cnpj: null, rating: 0 }
       }
+      // criacao de usuario de fato
+      const userId = await User.create(data)
+      sendResponse(res, 201, 'Usuário cadastrado. ID: ' + userId)
     } catch (error) {
       // se qualquer erro nao tratado acontecer
       sendResponse(res, 500, 'Ocorreu um erro ao criar o usuário: ' + error)
     }
   }
 
+  async createAddress (req, res) {
+    const { id } = req.params
+    const { cep, state, city, district, road, complement } = req.body
+    res.utilized = false
+
+    if (district === null || district === undefined) {
+      sendResponse(res, 406, 'O campo bairro não pode ter menos que 2 caracteres. ')
+      return
+    }
+
+    userValidation.cep(cep, res)
+    userValidation.state(state, res)
+    userValidation.city(city, res)
+    userValidation.road(road, res)
+
+    if (res.utilized) return
+
+    // se o usuário passar algo que não é um numero
+    if (!Number(id)) {
+      sendResponse(res, 406, 'O parâmetro passado precisa ser um número. ')
+      return
+    }
+
+    // se o ID do usuário não existir no banco de dados
+    const user = await User.findById(id)
+    if (user.length === 0) {
+      sendResponse(res, 406, 'O ID de usuário indicado não existe no banco de dados. ')
+      return
+    }
+
+    const data = { cep, state, city, district, road, complement }
+
+    try {
+      await User.createAddress(data, id)
+      await User.hasAddress(id)
+      sendResponse(res, 200, 'Endereço cadastrado. ')
+    } catch (error) {
+      sendResponse(res, 500, 'Ocorreu um erro ao cadastrar o endereço: ' + error)
+    }
+  }
+
   async findAll (req, res) {
+    // traz todos os usuários com seus enderecos
+    try {
+      const users = await User.findAll()
+      sendResponse(res, 200, users, true)
+    } catch (error) {
+      sendResponse(res, 500, 'Ocorreu um erro ao listar os usuários: ' + error)
+    }
+  }
+
+  async findAllWithAddress (req, res) {
     // traz todos os usuários com seus enderecos
     try {
       const users = await User.findAllWithAddress()
