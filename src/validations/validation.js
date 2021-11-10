@@ -7,7 +7,7 @@ const utils = {
   isOnlyLetters: (str) => !str.match(/[^a-z ]/igm),
   isDoubleSpaced: (str) => str.match('  ') != null,
   isSpaced: (str) => str.match(/[ ]/) != null,
-  isOnlyLettersAndDashs: (str) => !str.match(/[^0-9- ]/igm),
+  isOnlyLettersAndDashs: (str) => !str.match(/[^a-z- ]/igm),
   isValidGender: (str) => !str.match(/[^mfo ]/igm)
 }
 
@@ -25,7 +25,25 @@ const strings = (string, res, value, length) => {
 
 const userValidation = {
   name: (name, res) => {
-    strings(name, res, 'Nome', 3)
+    if (name === undefined || utils.isEmpty(name)) {
+      res.statusCode = 406
+      res.json({
+        status: false,
+        msg: 'O nome não pode ser vazio. '
+      })
+      res.utilized = true
+      return false
+    } else if (!utils.isOnlyLettersAndDashs(name)) {
+      res.statusCode = 406
+      res.json({
+        status: false,
+        msg: 'O nome não pode conter caracteres especiais. '
+      })
+      res.utilized = true
+      return false
+    } else {
+      strings(name, res, 'Nome', 3)
+    }
   },
   email: (email, res) => {
     if (email === undefined || utils.isEmpty(email) || !utils.isValidLength(email, 2)) {
@@ -55,7 +73,7 @@ const userValidation = {
     }
   },
   password: (password, res) => {
-    if (!utils.isValidLength(password, 8)) {
+    if (password === undefined || utils.isEmpty(password) || !utils.isValidLength(password, 8)) {
       res.statusCode = 406
       res.json({
         status: false,
