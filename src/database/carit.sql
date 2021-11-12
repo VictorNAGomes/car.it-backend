@@ -14,6 +14,7 @@ create table users (
     cnpj char(14) unique,
     rating decimal(2, 1) not null,
     codeToVerify char(6) default "000000",
+    hasAddress tinyint default 0,
     verified tinyint default 0,
     createdAt datetime not null default now(),
     editedAt datetime

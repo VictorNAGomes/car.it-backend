@@ -81,6 +81,19 @@ class Vehicle {
 
     return vehicles
   }
+
+  async findAllCarsByUserId (id) {
+    const vehicles = await knex.select().table('vehicles').where({ user_id: id })
+
+    return vehicles
+  }
+
+  async findAllCarsFavoritedById (id) {
+    let vehicles = await knex.raw('select vehicles.* from vehicles, favorites where vehicles.id = favorites.vehicle_id and favorites.user_id = ' + id)
+    vehicles = vehicles[0]
+
+    return vehicles
+  }
 }
 
 module.exports = new Vehicle()
