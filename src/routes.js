@@ -5,6 +5,8 @@ const LoginAuth = require('./middlewares/LoginAuth')
 
 const router = express.Router()
 
+router.get('/', (req, res) => res.send('Server is running'))
+
 router.get('/users', UserController.findAll)
 router.get('/users/address', UserController.findAllWithAddress)
 router.get('/user/:id', UserController.findById)
