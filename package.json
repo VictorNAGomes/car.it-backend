@@ -36,6 +36,7 @@
     "crypto": "^1.0.1",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
+    "imgur": "^1.0.2",
     "jsonwebtoken": "^8.5.1",
     "knex": "^0.95.11",
     "multer": "^1.4.3",
