@@ -2,6 +2,8 @@ const User = require('../models/User')
 const Vehicle = require('../models/Vehicle')
 const bcrypt = require('bcrypt')
 const JWT = require('jsonwebtoken')
+const imgur = require('imgur')
+const fs = require('fs')
 const { userValidation } = require('../validations/validation')
 const PasswordToken = require('../models/PasswordToken')
 const transporter = require('../transporter')
@@ -83,7 +85,22 @@ class UserController {
         data = { name, phone, password: hash, email, cpf: cpfCnpj, cnpj: null, rating: 0 }
       }
       // criacao de usuario de fato
+
+      const imgurData = await imgur.uploadFile(`./public/uploads/${req.file.filename}`)
+
+      fs.unlinkSync(`./public/uploads/${req.file.filename}`)
+
       const userId = await User.create(data)
+
+      const imageData = {
+        fileName: req.file.filename,
+        link: imgurData.link,
+        deleteHash: imgurData.deletehash,
+        user_id: userId
+      }
+
+      await User.insertImage(imageData)
+
       sendResponse(res, 201, 'Usuário cadastrado. ID: ' + userId)
     } catch (error) {
       // se qualquer erro nao tratado acontecer
@@ -594,6 +611,63 @@ class UserController {
       }
     } catch (error) {
       sendResponse(res, 500, 'Ocorreu um erro ao gerar a verificação de email: ' + error)
+    }
+  }
+
+  async getImage (req, res) {
+    try {
+      const { id } = req.params
+
+      const user = await User.findById(id)
+
+      if (user.length > 0) {
+        const image = await User.getImage(id)
+
+        sendResponse(res, 200, image, true)
+      } else {
+        sendResponse(res, 406, 'O ID de usuário indicado não existe no banco de dados. ')
+        return
+      }
+    } catch (error) {
+      sendResponse(res, 500, 'Ocorreu um erro ao exibir a imagem do usuário: ' + error)
+    }
+  }
+
+  async updateImage (req, res) {
+    try {
+      const { id } = req.params
+
+      const user = await User.findById(id)
+
+      if (user.length > 0) {
+        const image = await User.getImage(id)
+
+        const status = await imgur.deleteImage(image[0].deleteHash)
+
+        if (status) {
+          const imgurData = await imgur.uploadFile(`./public/uploads/${req.file.filename}`)
+
+          const imageData = {
+            fileName: req.file.filename,
+            link: imgurData.link,
+            deleteHash: imgurData.deletehash,
+            user_id: id
+          }
+
+          fs.unlinkSync(`./public/uploads/${req.file.filename}`)
+
+          await User.updateImage(imageData)
+
+          sendResponse(res, 200, 'Imagem alterado com sucesso. ')
+        } else {
+          sendResponse(res, 500, 'Erro ao apagar a imagem. ')
+        }
+      } else {
+        sendResponse(res, 406, 'O ID de usuário indicado não existe no banco de dados. ')
+        return
+      }
+    } catch (error) {
+      sendResponse(res, 500, 'Ocorreu um erro ao exibir a imagem do usuário: ' + error)
     }
   }
 }

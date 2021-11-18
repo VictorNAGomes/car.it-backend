@@ -121,6 +121,21 @@ class User {
     const result = await knex.where({ id: id }).update({ verified: 0, codeToVerify: '000000' }).table('users')
     return result
   }
+
+  async insertImage (data) {
+    const image = await knex.insert(data).table('user_image')
+    return image
+  }
+
+  async getImage (id) {
+    const image = await knex.where({ user_id: id }).select().table('user_image')
+    return image
+  }
+
+  async updateImage (data) {
+    const image = await knex.where({ user_id: data.user_id }).update(data).table('user_image')
+    return image
+  }
 }
 
 module.exports = new User()
