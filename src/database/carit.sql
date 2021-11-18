@@ -94,6 +94,17 @@ create table favorites (
         on delete cascade
 );
 
+create table user_image(
+    id int not null primary key auto_increment,
+    fileName varchar(120) not null,
+    link varchar(100) not null,
+    deleteHash varchar(100) not null,
+    user_id int not null,
+    constraint fk_user_image_id foreign key (user_id) references users(id)
+        on update cascade
+        on delete cascade
+);
+
 insert into additionals (name) values
 ("Ar condicionado"),
 ("Câmbio Borboleta"),
