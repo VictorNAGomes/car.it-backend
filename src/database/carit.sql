@@ -105,6 +105,17 @@ create table user_image(
         on delete cascade
 );
 
+create table vehicle_image(
+    id int not null primary key auto_increment,
+    fileName varchar(120) not null,
+    link varchar(100) not null,
+    deleteHash varchar(100) not null,
+    vehicle_id int not null,
+    constraint fk_vehicle_image_id foreign key (vehicle_id) references vehicles(id)
+        on update cascade
+        on delete cascade
+);
+
 insert into additionals (name) values
 ("Ar condicionado"),
 ("Câmbio Borboleta"),
