@@ -30,6 +30,7 @@ router.post('/user/:id/verifyEmail', LoginAuth, UserController.verifyEmail)
 router.post('/user/:id/setOrUnsetFavorite', LoginAuth, UserController.setOrUnsetFavorite)
 
 router.post('/vehicle', LoginAuth, VehicleController.create)
+router.post('/vehicle/:id/image', multer(multerConfig).array('file[]', 10), VehicleController.createImage)
 router.put('/vehicle/:id', LoginAuth, VehicleController.update)
 router.delete('/vehicle/:id', LoginAuth, VehicleController.delete)
 router.get('/vehicles', VehicleController.findAll)

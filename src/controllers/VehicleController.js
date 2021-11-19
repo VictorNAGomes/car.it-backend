@@ -362,6 +362,18 @@ class VehicleController {
       res.json({ msg: 'Ocorreu um erro: ' + err })
     }
   }
+
+  async createImage (req, res) {
+    try {
+      const { id } = req.params
+
+      res.statusCode = 200
+      res.json({ image: req.file, id })
+    } catch (err) {
+      res.statusCode = 500
+      res.json({ msg: 'Ocorreu um erro: ' + err })
+    }
+  }
 }
 
 module.exports = new VehicleController()
