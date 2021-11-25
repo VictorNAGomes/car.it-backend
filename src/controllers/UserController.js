@@ -86,20 +86,7 @@ class UserController {
       }
       // criacao de usuario de fato
 
-      const imgurData = await imgur.uploadFile(`./public/uploads/${req.file.filename}`)
-
-      fs.unlinkSync(`./public/uploads/${req.file.filename}`)
-
       const userId = await User.create(data)
-
-      const imageData = {
-        fileName: req.file.filename,
-        link: imgurData.link,
-        deleteHash: imgurData.deletehash,
-        user_id: userId
-      }
-
-      await User.insertImage(imageData)
 
       sendResponse(res, 201, 'Usuário cadastrado. ID: ' + userId)
     } catch (error) {
@@ -614,6 +601,44 @@ class UserController {
     }
   }
 
+  async createImage (req, res) {
+    try {
+      const { id } = req.params
+
+      const user = await User.findById(id)
+
+      if (user.length > 0) {
+        const image = await User.getImage(id)
+
+        if (image.length === 0) {
+          const imgurData = await imgur.uploadFile(`./public/uploads/${req.file.filename}`)
+
+          const imageData = {
+            fileName: req.file.filename,
+            link: imgurData.link,
+            deleteHash: imgurData.deletehash,
+            user_id: id
+          }
+
+          fs.unlinkSync(`./public/uploads/${req.file.filename}`)
+
+          await User.insertImage(imageData)
+
+          sendResponse(res, 200, 'Imagem cadastrada com sucesso')
+        } else {
+          fs.unlinkSync(`./public/uploads/${req.file.filename}`)
+          sendResponse(res, 406, 'Usuário indicado já possui uma imagem cadastrada. ')
+          return
+        }
+      } else {
+        sendResponse(res, 406, 'O ID de usuário indicado não existe no banco de dados. ')
+        return
+      }
+    } catch (error) {
+      sendResponse(res, 500, 'Ocorreu um erro ao criar a imagem do usuário: ' + error)
+    }
+  }
+
   async getImage (req, res) {
     try {
       const { id } = req.params
@@ -665,6 +690,33 @@ class UserController {
       } else {
         sendResponse(res, 406, 'O ID de usuário indicado não existe no banco de dados. ')
         return
+      }
+    } catch (error) {
+      sendResponse(res, 500, 'Ocorreu um erro ao exibir a imagem do usuário: ' + error)
+    }
+  }
+
+  async deleteImage (req, res) {
+    try {
+      const { id } = req.params
+
+      const user = await User.findById(id)
+
+      if (user.length > 0) {
+        const image = await User.getImage(id)
+
+        const status = await imgur.deleteImage(image[0].deleteHash)
+
+        if (status) {
+          await User.deleteImage(id)
+
+          sendResponse(res, 200, 'Imagem deletada com sucesso. ')
+        } else {
+          sendResponse(res, 406, 'O ID de usuário indicado não existe no banco de dados. ')
+          return
+        }
+      } else {
+        sendResponse(res, 500, 'Erro ao apagar a imagem. ')
       }
     } catch (error) {
       sendResponse(res, 500, 'Ocorreu um erro ao exibir a imagem do usuário: ' + error)

@@ -136,6 +136,11 @@ class User {
     const image = await knex.where({ user_id: data.user_id }).update(data).table('user_image')
     return image
   }
+
+  async deleteImage (id) {
+    const image = await knex.where({ user_id: id }).delete().table('user_image')
+    return image
+  }
 }
 
 module.exports = new User()
