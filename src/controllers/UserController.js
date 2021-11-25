@@ -27,14 +27,14 @@ const generate = n => {
   return ('' + number).substring(add)
 }
 
-const sendResponse = (res, code, msg, isNotMessage = false) => {
+const sendResponse = (status, res, code, msg, isNotMessage = false) => {
   if (isNotMessage) {
     res.statusCode = code
-    res.json(msg)
+    res.json({ status, data: msg })
     return
   }
   res.statusCode = code
-  res.json({ msg: msg })
+  res.json({ status, msg: msg })
 }
 
 class UserController {
@@ -57,7 +57,7 @@ class UserController {
 
       // se a consulta de email retornar algo
       if (emailExists.length > 0) {
-        sendResponse(res, 406, 'O email já foi cadastrado anteriormente no sistema. ')
+        sendResponse(false, res, 406, 'O email já foi cadastrado anteriormente no sistema. ')
         return
       }
 
@@ -68,7 +68,7 @@ class UserController {
 
         // se a consulta de cnpj retornar algo
         if (cnpjExists.length > 0) {
-          sendResponse(res, 406, 'O CNPJ já foi cadastrado anteriormente no sistema. ')
+          sendResponse(false, res, 406, 'O CNPJ já foi cadastrado anteriormente no sistema. ')
           return
         }
         // obj com o novo usuario já validado
@@ -78,7 +78,7 @@ class UserController {
 
         // se a consulta de cpf retornar algo
         if (cpfExists.length > 0) {
-          sendResponse(res, 406, 'O CPF já foi cadastrado anteriormente no sistema. ')
+          sendResponse(false, res, 406, 'O CPF já foi cadastrado anteriormente no sistema. ')
           return
         }
         // obj com o novo usuario já validado
@@ -88,10 +88,10 @@ class UserController {
 
       const userId = await User.create(data)
 
-      sendResponse(res, 201, 'Usuário cadastrado. ID: ' + userId)
+      sendResponse(true, res, 201, 'Usuário cadastrado. ID: ' + userId)
     } catch (error) {
       // se qualquer erro nao tratado acontecer
-      sendResponse(res, 500, 'Ocorreu um erro ao criar o usuário: ' + error)
+      sendResponse(false, res, 500, 'Ocorreu um erro ao criar o usuário: ' + error)
     }
   }
 
@@ -101,7 +101,7 @@ class UserController {
     res.utilized = false
 
     if (district === null || district === undefined) {
-      sendResponse(res, 406, 'O campo bairro não pode ter menos que 2 caracteres. ')
+      sendResponse(false, res, 406, 'O campo bairro não pode ter menos que 2 caracteres. ')
       return
     }
 
@@ -114,14 +114,14 @@ class UserController {
 
     // se o usuário passar algo que não é um numero
     if (!Number(id)) {
-      sendResponse(res, 406, 'O parâmetro passado precisa ser um número. ')
+      sendResponse(false, res, 406, 'O parâmetro passado precisa ser um número. ')
       return
     }
 
     // se o ID do usuário não existir no banco de dados
     const user = await User.findById(id)
     if (user.length === 0) {
-      sendResponse(res, 406, 'O ID de usuário indicado não existe no banco de dados. ')
+      sendResponse(false, res, 406, 'O ID de usuário indicado não existe no banco de dados. ')
       return
     }
 
@@ -130,9 +130,9 @@ class UserController {
     try {
       await User.createAddress(data, id)
       await User.hasAddress(id)
-      sendResponse(res, 200, 'Endereço cadastrado. ')
+      sendResponse(true, res, 200, 'Endereço cadastrado. ')
     } catch (error) {
-      sendResponse(res, 500, 'Ocorreu um erro ao cadastrar o endereço: ' + error)
+      sendResponse(false, res, 500, 'Ocorreu um erro ao cadastrar o endereço: ' + error)
     }
   }
 
@@ -140,9 +140,9 @@ class UserController {
     // traz todos os usuários com seus enderecos
     try {
       const users = await User.findAll()
-      sendResponse(res, 200, users, true)
+      sendResponse(true, res, 200, users, true)
     } catch (error) {
-      sendResponse(res, 500, 'Ocorreu um erro ao listar os usuários: ' + error)
+      sendResponse(false, res, 500, 'Ocorreu um erro ao listar os usuários: ' + error)
     }
   }
 
@@ -150,9 +150,9 @@ class UserController {
     // traz todos os usuários com seus enderecos
     try {
       const users = await User.findAllWithAddress()
-      sendResponse(res, 200, users, true)
+      sendResponse(true, res, 200, users, true)
     } catch (error) {
-      sendResponse(res, 500, 'Ocorreu um erro ao listar os usuários: ' + error)
+      sendResponse(false, res, 500, 'Ocorreu um erro ao listar os usuários: ' + error)
     }
   }
 
@@ -162,22 +162,22 @@ class UserController {
 
       // se o usuário passar algo que não é um numero
       if (!Number(id)) {
-        sendResponse(res, 406, 'O parâmetro passado precisa ser um número. ')
+        sendResponse(false, res, 406, 'O parâmetro passado precisa ser um número. ')
         return
       }
 
       // se o ID do usuário não existir no banco de dados
       const user = await User.findOneWithAddress(id)
       if (user.length === 0) {
-        sendResponse(res, 406, 'O ID de usuário indicado não existe no banco de dados. ')
+        sendResponse(false, res, 406, 'O ID de usuário indicado não existe no banco de dados. ')
         return
       }
 
       const result = await User.findFavorites(id)
 
-      sendResponse(res, 200, result, true)
+      sendResponse(true, res, 200, result, true)
     } catch (error) {
-      sendResponse(res, 500, 'Ocorreu um erro ao listar o usuário: ' + error)
+      sendResponse(false, res, 500, 'Ocorreu um erro ao listar o usuário: ' + error)
     }
   }
 
@@ -188,20 +188,20 @@ class UserController {
 
       // se o usuário passar algo que não é um numero
       if (!Number(id)) {
-        sendResponse(res, 406, 'O parâmetro passado precisa ser um número. ')
+        sendResponse(false, res, 406, 'O parâmetro passado precisa ser um número. ')
         return
       }
 
       // se o ID do usuário não existir no banco de dados
       const user = await User.findOneWithAddress(id)
       if (user.length === 0) {
-        sendResponse(res, 406, 'O ID de usuário indicado não existe no banco de dados. ')
+        sendResponse(false, res, 406, 'O ID de usuário indicado não existe no banco de dados. ')
         return
       }
 
-      sendResponse(res, 200, user, true)
+      sendResponse(true, res, 200, user, true)
     } catch (error) {
-      sendResponse(res, 500, 'Ocorreu um erro ao listar o usuário: ' + error)
+      sendResponse(false, res, 500, 'Ocorreu um erro ao listar o usuário: ' + error)
     }
   }
 
@@ -210,14 +210,14 @@ class UserController {
 
     // se o usuário passar algo que não é um numero
     if (!Number(id)) {
-      sendResponse(res, 406, 'O parâmetro passado precisa ser um número. ')
+      sendResponse(false, res, 406, 'O parâmetro passado precisa ser um número. ')
       return
     }
 
     // se o ID do usuário não existir no banco de dados
     let user = await User.findOneWithAddress(id)
     if (user.length === 0) {
-      sendResponse(res, 406, 'O ID de usuário indicado não existe no banco de dados. ')
+      sendResponse(false, res, 406, 'O ID de usuário indicado não existe no banco de dados. ')
       return
     }
 
@@ -261,7 +261,7 @@ class UserController {
       }
       const emailExists = await User.findByEmail(email)
       if (emailExists.length > 0) {
-        sendResponse(res, 406, 'O email inserido já existe no banco de dados. ')
+        sendResponse(false, res, 406, 'O email inserido já existe no banco de dados. ')
         return
       }
     }
@@ -273,7 +273,7 @@ class UserController {
       }
       const cpfExists = await User.findByCpf(cpf)
       if (cpfExists.length > 0) {
-        sendResponse(res, 406, 'O CPF já foi cadastrado anteriormente no sistema. ')
+        sendResponse(false, res, 406, 'O CPF já foi cadastrado anteriormente no sistema. ')
         return
       }
     }
@@ -285,7 +285,7 @@ class UserController {
       }
       const cnpjExists = await User.findByCnpj(cnpj)
       if (cnpjExists.length > 0) {
-        sendResponse(res, 406, 'O CNPJ já foi cadastrado anteriormente no sistema. ')
+        sendResponse(false, res, 406, 'O CNPJ já foi cadastrado anteriormente no sistema. ')
         return
       }
     }
@@ -328,10 +328,10 @@ class UserController {
       await User.setUnverified(id)
 
       // printar o usuario com o respectivo endereco
-      sendResponse(res, 200, 'Usuário atualizado. ')
+      sendResponse(true, res, 200, 'Usuário atualizado. ')
     } catch (error) {
       // se algo deu errado nos updates
-      sendResponse(res, 500, 'Ocorreu um erro ao atualizar o usuário: ' + error)
+      sendResponse(false, res, 500, 'Ocorreu um erro ao atualizar o usuário: ' + error)
     }
   }
 
@@ -343,14 +343,14 @@ class UserController {
 
       // se o parâmetro não for um numero
       if (!Number(id)) {
-        sendResponse(res, 406, 'O parâmetro passado precisa ser um número. ')
+        sendResponse(false, res, 406, 'O parâmetro passado precisa ser um número. ')
         return
       }
 
       // se o id não existir
       const result = await User.findById(id)
       if (result.length === 0) {
-        sendResponse(res, 406, 'O ID de usuário indicado não existe no banco de dados. ')
+        sendResponse(false, res, 406, 'O ID de usuário indicado não existe no banco de dados. ')
         return
       }
 
@@ -360,9 +360,9 @@ class UserController {
       }
 
       await User.updateRating(id, rating)
-      sendResponse(res, 200, 'Rating do usuário atualizado. ')
+      sendResponse(true, res, 200, 'Rating do usuário atualizado. ')
     } catch (error) {
-      sendResponse(res, 500, 'Ocorreu um erro ao atualizar o rating do usuário: ' + error)
+      sendResponse(false, res, 500, 'Ocorreu um erro ao atualizar o rating do usuário: ' + error)
     }
   }
 
@@ -371,24 +371,24 @@ class UserController {
 
     // se o parâmetro não for um numero
     if (!Number(id)) {
-      sendResponse(res, 406, 'O parâmetro passado precisa ser um número. ')
+      sendResponse(false, res, 406, 'O parâmetro passado precisa ser um número. ')
       return
     }
 
     // se o id não existir
     const result = await User.findById(id)
     if (result.length === 0) {
-      sendResponse(res, 406, 'O ID de usuário indicado não existe no banco de dados. ')
+      sendResponse(false, res, 406, 'O ID de usuário indicado não existe no banco de dados. ')
       return
     }
 
     try {
       // deleção do usuário
       await User.delete(id)
-      sendResponse(res, 200, 'Usuário deletado. ID: ' + id)
+      sendResponse(true, res, 200, 'Usuário deletado. ID: ' + id)
     } catch (error) {
       // deleção com erro
-      sendResponse(res, 500, 'Ocorreu um erro ao deletar o usuário: ' + error)
+      sendResponse(false, res, 500, 'Ocorreu um erro ao deletar o usuário: ' + error)
     }
   }
 
@@ -398,21 +398,21 @@ class UserController {
 
     // se o parâmetro não for um numero
     if (!Number(id) || !Number(vehicleId)) {
-      sendResponse(res, 406, 'O parâmetro passado precisa ser um número. ')
+      sendResponse(false, res, 406, 'O parâmetro passado precisa ser um número. ')
       return
     }
 
     // se o userid não existir
     const resultUser = await User.findById(id)
     if (resultUser.length === 0) {
-      sendResponse(res, 406, 'O ID de usuário indicado não existe no banco de dados. ')
+      sendResponse(false, res, 406, 'O ID de usuário indicado não existe no banco de dados. ')
       return
     }
 
     // se o vehicleid não existir
     const resultVehicle = await Vehicle.findById(vehicleId)
     if (resultVehicle.length === 0) {
-      sendResponse(res, 406, 'O ID de veículo indicado não existe no banco de dados. ')
+      sendResponse(false, res, 406, 'O ID de veículo indicado não existe no banco de dados. ')
       return
     }
 
@@ -420,13 +420,13 @@ class UserController {
       const isFavorite = await User.findOneFavorite(id, vehicleId)
       if (isFavorite.length === 0) {
         await User.setFavorite(id, vehicleId)
-        sendResponse(res, 200, 'Favorido adicionado com sucesso. ID: ' + id + ', vehicleID: ' + vehicleId)
+        sendResponse(true, res, 200, 'Favorido adicionado com sucesso. ID: ' + id + ', vehicleID: ' + vehicleId)
       } else {
         await User.unsetFavorite(id, vehicleId)
-        sendResponse(res, 200, 'Favorido removido com sucesso. ID: ' + id + ', vehicleID: ' + vehicleId)
+        sendResponse(true, res, 200, 'Favorido removido com sucesso. ID: ' + id + ', vehicleID: ' + vehicleId)
       }
     } catch (error) {
-      sendResponse(res, 500, 'Ocorreu um erro ao (des)favoritar um veículo: ' + error)
+      sendResponse(false, res, 500, 'Ocorreu um erro ao (des)favoritar um veículo: ' + error)
     }
   }
 
@@ -447,12 +447,12 @@ class UserController {
           text: 'Aqui está o seu token para recuperação de senha: ' + token + '; Utilize-o apenas uma vez. '
         })
         console.log(message)
-        sendResponse(res, 200, 'Confira em seu email o token para recuperação de senha. Token: ' + token)
+        sendResponse(true, res, 200, 'Confira em seu email o token para recuperação de senha. Token: ' + token)
       } else {
-        sendResponse(res, 406, 'O email de usuário indicado não existe no banco de dados. ')
+        sendResponse(false, res, 406, 'O email de usuário indicado não existe no banco de dados. ')
       }
     } catch (error) {
-      sendResponse(res, 500, 'Ocorreu um erro ao gerar a recuperação de senha: ' + error)
+      sendResponse(false, res, 500, 'Ocorreu um erro ao gerar a recuperação de senha: ' + error)
     }
   }
 
@@ -464,7 +464,7 @@ class UserController {
       if (result.length > 0) {
         result = result[0]
         if (result.used) {
-          sendResponse(res, 403, 'O token inserido para a recuperação de senha já foi anteriormente utilizado. ')
+          sendResponse(false, res, 403, 'O token inserido para a recuperação de senha já foi anteriormente utilizado. ')
         } else {
           userValidation.password(password, res)
           if (res.utilized) return
@@ -472,13 +472,13 @@ class UserController {
           const hash = await bcrypt.hash(password, salt)
           await User.changePassword(hash, result.user_id)
           await PasswordToken.setUsed(token)
-          sendResponse(res, 200, 'Senha modificada. ')
+          sendResponse(true, res, 200, 'Senha modificada. ')
         }
       } else {
-        sendResponse(res, 406, 'O token inserido para a recuperação de senha é invalido. ')
+        sendResponse(false, res, 406, 'O token inserido para a recuperação de senha é invalido. ')
       }
     } catch (error) {
-      sendResponse(res, 500, 'Ocorreu um erro ao recuperar a senha: ' + error)
+      sendResponse(false, res, 500, 'Ocorreu um erro ao recuperar a senha: ' + error)
     }
   }
 
@@ -495,24 +495,24 @@ class UserController {
         const result = await bcrypt.compare(password, user.password)
         if (result) {
           const token = JWT.sign({ email: email }, secretJwt)
-          sendResponse(res, 200, { token: token, id: user.id }, true)
+          sendResponse(true, res, 200, { token: token, id: user.id }, true)
         } else {
-          sendResponse(res, 406, 'Credenciais inválidas. ')
+          sendResponse(false, res, 406, 'Credenciais inválidas. ')
         }
       } else {
-        sendResponse(res, 406, 'Credenciais inválidas. ')
+        sendResponse(false, res, 406, 'Credenciais inválidas. ')
       }
     } catch (error) {
-      sendResponse(res, 500, 'Ocorreu um erro ao realizar o login: ' + error)
+      sendResponse(false, res, 500, 'Ocorreu um erro ao realizar o login: ' + error)
     }
   }
 
   async findAllOrderByRating (req, res) {
     try {
       const result = await User.findAllOrderByRating()
-      sendResponse(res, 200, result, true)
+      sendResponse(true, res, 200, result, true)
     } catch (error) {
-      sendResponse(res, 500, 'Ocorreu um erro ao requisitar todos os usuários: ' + error)
+      sendResponse(false, res, 500, 'Ocorreu um erro ao requisitar todos os usuários: ' + error)
     }
   }
 
@@ -521,22 +521,22 @@ class UserController {
 
     // se o parâmetro não for um numero
     if (!Number(id)) {
-      sendResponse(res, 406, 'O parâmetro passado precisa ser um número. ')
+      sendResponse(false, res, 406, 'O parâmetro passado precisa ser um número. ')
       return
     }
 
     // se o id não existir
     const result = await User.findById(id)
     if (result.length === 0) {
-      sendResponse(res, 406, 'O ID de usuário indicado não existe no banco de dados. ')
+      sendResponse(false, res, 406, 'O ID de usuário indicado não existe no banco de dados. ')
       return
     }
 
     try {
       const userVehicles = await User.findByIdWithVehicles(id)
-      sendResponse(res, 200, userVehicles, true)
+      sendResponse(true, res, 200, userVehicles, true)
     } catch (error) {
-      sendResponse(res, 500, 'Ocorreu um erro ao requisitar os veículos do usuário: ' + error)
+      sendResponse(false, res, 500, 'Ocorreu um erro ao requisitar os veículos do usuário: ' + error)
     }
   }
 
@@ -548,7 +548,7 @@ class UserController {
         user = user[0]
         if (!user.verified) {
           if (user.codeToVerify !== '000000') {
-            sendResponse(res, 406, 'Um código para a verificação já foi enviado para esse email.  ')
+            sendResponse(false, res, 406, 'Um código para a verificação já foi enviado para esse email.  ')
             return
           }
           const code = generate(6)
@@ -560,15 +560,15 @@ class UserController {
           })
           await User.updateCode(user.id, code)
           console.log(message)
-          sendResponse(res, 200, 'Confira no email indicado o código para validação. ')
+          sendResponse(true, res, 200, 'Confira no email indicado o código para validação. ')
         } else {
-          sendResponse(res, 406, 'O email do usuário indicado já foi verificado anteriormente. ')
+          sendResponse(false, res, 406, 'O email do usuário indicado já foi verificado anteriormente. ')
         }
       } else {
-        sendResponse(res, 406, 'O email de usuário indicado não existe no banco de dados. ')
+        sendResponse(false, res, 406, 'O email de usuário indicado não existe no banco de dados. ')
       }
     } catch (error) {
-      sendResponse(res, 500, 'Ocorreu um erro ao gerar a verificação de email: ' + error)
+      sendResponse(false, res, 500, 'Ocorreu um erro ao gerar a verificação de email: ' + error)
     }
   }
 
@@ -586,18 +586,18 @@ class UserController {
         if (user.codeToVerify !== '000000') {
           if (user.codeToVerify === code) {
             await User.verifyEmail(email)
-            sendResponse(res, 200, 'Email verificado. Agora você pode fazer requisiçÕes antes não liberadas com essa conta. ')
+            sendResponse(true, res, 200, 'Email verificado. Agora você pode fazer requisiçÕes antes não liberadas com essa conta. ')
           } else {
-            sendResponse(res, 406, 'O código de verificação inserido não condiz com o email informado. ')
+            sendResponse(false, res, 406, 'O código de verificação inserido não condiz com o email informado. ')
           }
         } else {
-          sendResponse(res, 406, 'O email de usuário indicado ainda não recebeu um código de verificação. ')
+          sendResponse(false, res, 406, 'O email de usuário indicado ainda não recebeu um código de verificação. ')
         }
       } else {
-        sendResponse(res, 406, 'O email de usuário indicado não existe no banco de dados. ')
+        sendResponse(false, res, 406, 'O email de usuário indicado não existe no banco de dados. ')
       }
     } catch (error) {
-      sendResponse(res, 500, 'Ocorreu um erro ao gerar a verificação de email: ' + error)
+      sendResponse(false, res, 500, 'Ocorreu um erro ao gerar a verificação de email: ' + error)
     }
   }
 
@@ -624,18 +624,18 @@ class UserController {
 
           await User.insertImage(imageData)
 
-          sendResponse(res, 200, 'Imagem cadastrada com sucesso')
+          sendResponse(true, res, 200, 'Imagem cadastrada com sucesso')
         } else {
           fs.unlinkSync(`./public/uploads/${req.file.filename}`)
-          sendResponse(res, 406, 'Usuário indicado já possui uma imagem cadastrada. ')
+          sendResponse(false, res, 406, 'Usuário indicado já possui uma imagem cadastrada. ')
           return
         }
       } else {
-        sendResponse(res, 406, 'O ID de usuário indicado não existe no banco de dados. ')
+        sendResponse(false, res, 406, 'O ID de usuário indicado não existe no banco de dados. ')
         return
       }
     } catch (error) {
-      sendResponse(res, 500, 'Ocorreu um erro ao criar a imagem do usuário: ' + error)
+      sendResponse(false, res, 500, 'Ocorreu um erro ao criar a imagem do usuário: ' + error)
     }
   }
 
@@ -648,13 +648,13 @@ class UserController {
       if (user.length > 0) {
         const image = await User.getImage(id)
 
-        sendResponse(res, 200, image, true)
+        sendResponse(true, res, 200, image, true)
       } else {
-        sendResponse(res, 406, 'O ID de usuário indicado não existe no banco de dados. ')
+        sendResponse(false, res, 406, 'O ID de usuário indicado não existe no banco de dados. ')
         return
       }
     } catch (error) {
-      sendResponse(res, 500, 'Ocorreu um erro ao exibir a imagem do usuário: ' + error)
+      sendResponse(false, res, 500, 'Ocorreu um erro ao exibir a imagem do usuário: ' + error)
     }
   }
 
@@ -683,16 +683,16 @@ class UserController {
 
           await User.updateImage(imageData)
 
-          sendResponse(res, 200, 'Imagem alterado com sucesso. ')
+          sendResponse(true, res, 200, 'Imagem alterado com sucesso. ')
         } else {
-          sendResponse(res, 500, 'Erro ao apagar a imagem. ')
+          sendResponse(false, res, 500, 'Erro ao apagar a imagem. ')
         }
       } else {
-        sendResponse(res, 406, 'O ID de usuário indicado não existe no banco de dados. ')
+        sendResponse(false, res, 406, 'O ID de usuário indicado não existe no banco de dados. ')
         return
       }
     } catch (error) {
-      sendResponse(res, 500, 'Ocorreu um erro ao exibir a imagem do usuário: ' + error)
+      sendResponse(false, res, 500, 'Ocorreu um erro ao exibir a imagem do usuário: ' + error)
     }
   }
 
@@ -710,16 +710,16 @@ class UserController {
         if (status) {
           await User.deleteImage(id)
 
-          sendResponse(res, 200, 'Imagem deletada com sucesso. ')
+          sendResponse(true, res, 200, 'Imagem deletada com sucesso. ')
         } else {
-          sendResponse(res, 406, 'O ID de usuário indicado não existe no banco de dados. ')
+          sendResponse(false, res, 406, 'O ID de usuário indicado não existe no banco de dados. ')
           return
         }
       } else {
-        sendResponse(res, 500, 'Erro ao apagar a imagem. ')
+        sendResponse(false, res, 500, 'Erro ao apagar a imagem. ')
       }
     } catch (error) {
-      sendResponse(res, 500, 'Ocorreu um erro ao exibir a imagem do usuário: ' + error)
+      sendResponse(false, res, 500, 'Ocorreu um erro ao exibir a imagem do usuário: ' + error)
     }
   }
 }

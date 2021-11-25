@@ -51,11 +51,11 @@ class VehicleController {
         }
 
         res.statusCode = 201
-        res.json({ msg: 'Anúncio do Veículo cadastrado.' })
+        res.json({ status: true, msg: 'Anúncio do Veículo cadastrado.' })
       }
     } catch (err) {
       res.statusCode = 500
-      res.json({ msg: 'Ocorreu um erro ao criar o anúncio do Veículo: ' + err })
+      res.json({ status: false, msg: 'Ocorreu um erro ao criar o anúncio do Veículo: ' + err })
     }
   }
 
@@ -81,10 +81,10 @@ class VehicleController {
       }
 
       res.statusCode = 200
-      res.json({ vehicles: vehicleAdd })
+      res.json({ status: true, vehicles: vehicleAdd })
     } catch (err) {
       res.statusCode = 500
-      res.json({ msg: 'Ocorreu um erro ao procurar os anúncios dos Veículos: ' + err })
+      res.json({ status: false, msg: 'Ocorreu um erro ao procurar os anúncios dos Veículos: ' + err })
     }
   }
 
@@ -107,14 +107,14 @@ class VehicleController {
         }
 
         res.statusCode = 200
-        res.json({ vehicle: vehicleAdd })
+        res.json({ status: true, vehicle: vehicleAdd })
       } else {
         res.statusCode = 406
-        res.json({ msg: 'Não há veículos cadastrados com esse id' })
+        res.json({ status: false, msg: 'Não há veículos cadastrados com esse id' })
       }
     } catch (err) {
       res.statusCode = 500
-      res.json({ msg: 'Ocorreu um erro ao procurar o anúncio do Veículo: ' + err })
+      res.json({ status: false, msg: 'Ocorreu um erro ao procurar o anúncio do Veículo: ' + err })
     }
   }
 
@@ -211,15 +211,15 @@ class VehicleController {
             }
           }
           res.statusCode = 200
-          res.json({ msg: 'Anúncio do Veículo editado com sucesso.' })
+          res.json({ status: true, msg: 'Anúncio do Veículo editado com sucesso.' })
         }
       } else {
         res.statusCode = 406
-        res.json({ msg: 'Não há veículos cadastrados com esse id' })
+        res.json({ status: false, msg: 'Não há veículos cadastrados com esse id' })
       }
     } catch (err) {
       res.statusCode = 500
-      res.json({ msg: 'Ocorreu um erro ao editar o anúncio do Veículo: ' + err })
+      res.json({ status: false, msg: 'Ocorreu um erro ao editar o anúncio do Veículo: ' + err })
     }
   }
 
@@ -233,14 +233,14 @@ class VehicleController {
         await Vehicle.deleteAdd(id)
 
         res.statusCode = 200
-        res.json({ msg: 'Anúncio do Veículo deletado com sucesso.' })
+        res.json({ status: true, msg: 'Anúncio do Veículo deletado com sucesso.' })
       } else {
         res.statusCode = 406
-        res.json({ msg: 'Não há veículos cadastrados com esse id' })
+        res.json({ status: false, msg: 'Não há veículos cadastrados com esse id' })
       }
     } catch (err) {
       res.statusCode = 500
-      res.json({ msg: 'Ocorreu um erro ao deletar o anúncio do Veículo: ' + err })
+      res.json({ status: false, msg: 'Ocorreu um erro ao deletar o anúncio do Veículo: ' + err })
     }
   }
 
@@ -250,14 +250,14 @@ class VehicleController {
 
       if (vehicles.length > 0) {
         res.statusCode = 200
-        res.json({ vehicles })
+        res.json({ status: true, vehicles })
       } else {
         res.statusCode = 404
-        res.json({ msg: 'Não há carros cadastrados ainda' })
+        res.json({ status: false, msg: 'Não há carros cadastrados ainda' })
       }
     } catch (err) {
       res.statusCode = 500
-      res.json({ msg: 'Ocorreu um erro: ' + err })
+      res.json({ status: false, msg: 'Ocorreu um erro: ' + err })
     }
   }
 
@@ -267,14 +267,14 @@ class VehicleController {
 
       if (vehicles.length > 0) {
         res.statusCode = 200
-        res.json({ vehicles })
+        res.json({ status: true, vehicles })
       } else {
         res.statusCode = 404
-        res.json({ msg: 'Não há motos cadastradas ainda' })
+        res.json({ status: false, msg: 'Não há motos cadastradas ainda' })
       }
     } catch (err) {
       res.statusCode = 500
-      res.json({ msg: 'Ocorreu um erro: ' + err })
+      res.json({ status: false, msg: 'Ocorreu um erro: ' + err })
     }
   }
 
@@ -351,15 +351,15 @@ class VehicleController {
 
         if (vehicles.length > 0) {
           res.statusCode = 200
-          res.json({ vehicles })
+          res.json({ status: true, vehicles })
         } else {
           res.statusCode = 404
-          res.json({ msg: 'Nenhum veículo encontrado' })
+          res.json({ status: false, msg: 'Nenhum veículo encontrado' })
         }
       }
     } catch (err) {
       res.statusCode = 500
-      res.json({ msg: 'Ocorreu um erro: ' + err })
+      res.json({ status: false, msg: 'Ocorreu um erro: ' + err })
     }
   }
 
@@ -368,10 +368,10 @@ class VehicleController {
       const { id } = req.params
 
       res.statusCode = 200
-      res.json({ image: req.file, id })
+      res.json({ status: true, image: req.file, id })
     } catch (err) {
       res.statusCode = 500
-      res.json({ msg: 'Ocorreu um erro: ' + err })
+      res.json({ status: false, msg: 'Ocorreu um erro: ' + err })
     }
   }
 }
