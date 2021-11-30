@@ -1,5 +1,7 @@
 const Vehicle = require('../models/Vehicle')
 const { vehicleValidation } = require('../validations/validation')
+const imgur = require('imgur')
+const fs = require('fs')
 
 class VehicleController {
   async create (req, res) {
@@ -367,8 +369,99 @@ class VehicleController {
     try {
       const { id } = req.params
 
-      res.statusCode = 200
-      res.json({ status: true, image: req.file, id })
+      const vehicle = await Vehicle.findById(id)
+
+      if (vehicle.length > 0) {
+        const images = await Vehicle.getImages(id)
+
+        if (images.length < 10) {
+          const imgurData = await imgur.uploadFile(`./public/uploads/${req.file.filename}`)
+
+          const imageData = {
+            fileName: req.file.filename,
+            link: imgurData.link,
+            deleteHash: imgurData.deletehash,
+            vehicle_id: id
+          }
+
+          fs.unlinkSync(`./public/uploads/${req.file.filename}`)
+
+          await Vehicle.insertImage(imageData)
+
+          res.statusCode = 200
+          res.json({ status: true, msg: 'Imagem cadastrada com sucesso. ' })
+        } else {
+          fs.unlinkSync(`./public/uploads/${req.file.filename}`)
+          res.statusCode = 406
+          res.json({ status: false, msg: 'O máximo de imagens é de 10 por veículos cadastrados. ' })
+        }
+      } else {
+        fs.unlinkSync(`./public/uploads/${req.file.filename}`)
+        res.statusCode = 404
+        res.json({ status: false, msg: 'O ID do veículo indicado não existe no banco de dados. ' })
+      }
+    } catch (err) {
+      fs.unlinkSync(`./public/uploads/${req.file.filename}`)
+      res.statusCode = 500
+      res.json({ status: false, msg: 'Ocorreu um erro: ' + err })
+    }
+  }
+
+  async getImages (req, res) {
+    try {
+      const { id } = req.params
+
+      const vehicle = await Vehicle.findById(id)
+
+      if (vehicle.length > 0) {
+        const images = await Vehicle.getImages(id)
+
+        res.statusCode = 200
+        res.json({ status: true, images })
+      } else {
+        res.statusCode = 404
+        res.json({ status: false, msg: 'O ID de usuário indicado não existe no banco de dados. ' })
+      }
+    } catch (err) {
+      res.statusCode = 500
+      res.json({ status: false, msg: 'Ocorreu um erro: ' + err })
+    }
+  }
+
+  async deleteImage (req, res) {
+    try {
+      const { vehicleId, imageId } = req.params
+
+      const vehicle = await Vehicle.findById(vehicleId)
+
+      if (vehicle.length > 0) {
+        const image = await Vehicle.getSingleImage(imageId)
+
+        if (image.length > 0) {
+          const status = await imgur.deleteImage(image[0].deleteHash)
+
+          if (image[0].vehicle_id === parseInt(vehicleId)) {
+            if (status) {
+              await Vehicle.deleteImage(imageId)
+
+              res.statusCode = 200
+              res.json({ status: true, msg: 'Imagem deletada com sucesso. ' })
+            } else {
+              res.statusCode = 500
+              res.json({ status: false, msg: 'Erro ao deletar a imagem. ' })
+            }
+          } else {
+            res.statusCode = 403
+            res.json({ status: false, msg: 'Esta imagem não pertence a este veículo. ' })
+          }
+        } else {
+          res.statusCode = 404
+          res.json({ status: false, msg: 'Imagem não existe no banco de dados. ' })
+        }
+      } else {
+        res.statusCode = 404
+        res.json({ status: false, msg: 'O ID de usuário indicado não existe no banco de dados. ' })
+      }
     } catch (err) {
       res.statusCode = 500
       res.json({ status: false, msg: 'Ocorreu um erro: ' + err })

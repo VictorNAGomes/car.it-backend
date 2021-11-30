@@ -94,6 +94,26 @@ class Vehicle {
 
     return vehicles
   }
+
+  async insertImage (data) {
+    const image = await knex.insert(data).table('vehicle_image')
+    return image
+  }
+
+  async getImages (id) {
+    const image = await knex.where({ vehicle_id: id }).select().table('vehicle_image')
+    return image
+  }
+
+  async deleteImage (id) {
+    const image = await knex.where({ id: id }).delete().table('vehicle_image')
+    return image
+  }
+
+  async getSingleImage (id) {
+    const image = await knex.where({ id: id }).select().table('vehicle_image')
+    return image
+  }
 }
 
 module.exports = new Vehicle()
