@@ -193,7 +193,7 @@ class UserController {
       }
 
       // se o ID do usuário não existir no banco de dados
-      const user = await User.findOneWithAddress(id)
+      const user = await User.findById(id)
       if (user.length === 0) {
         sendResponse(false, res, 406, 'O ID de usuário indicado não existe no banco de dados. ')
         return
